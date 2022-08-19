@@ -1,0 +1,98 @@
+@import '@src/style/var.less';
+
+// 整体页面布局
+.layout_main {
+  height: 100%;
+}
+
+// 头部固定
+.layout_header {
+  height: @header-height;
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 24px;
+  background-color: @header-bg;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 5%);
+  &_left {
+  }
+  &_action {
+    display: flex;
+    align-items: center;
+    color: #fff;
+  }
+}
+
+// 主体布局
+.layout_body {
+  height: calc(100% - @header-height);
+}
+
+// 侧边栏布局 固定
+.sidebar {
+  padding-top: 8px;
+  overflow-y: auto;
+  overflow-x: auto;
+  box-shadow: 2px 0 6px 0 rgba(0, 21, 41, 0.12);
+  :global {
+    .mp-antd-layout-sider-children {
+      height: auto !important;
+    }
+    .mp-antd-menu-item,
+    .mp-antd-menu-submenu-title {
+      span {
+        vertical-align: middle;
+      }
+    }
+
+    .mp-antd-menu-item-icon {
+      margin-right: 5px !important;
+    }
+
+    .mp-antd-menu-submenu-title {
+      img,
+      div {
+        margin-right: 5px;
+      }
+    }
+    // 触发区域阴影
+    .mp-antd-layout-sider-trigger {
+      box-shadow: 0 -2px 6px 0 rgba(0, 21, 41, 0.12);
+    }
+  }
+
+  &_menu {
+    border-right: none;
+  }
+}
+
+// 内容主体
+.content {
+  background-color: @gray-2;
+  overflow-y: auto;
+  will-change: width;
+  // 产品运营平台内容区域
+  &_wrapper {
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  &_body {
+    min-height: calc(100% - 95px);
+  }
+
+  &_footer {
+    font-size: 12px;
+  }
+}
+
+// 隐藏
+.hidden {
+  display: none;
+}
+
+.micro_wrapper,
+.micro_container {
+  height: 100%;
+}

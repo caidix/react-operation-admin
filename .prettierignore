@@ -1,0 +1,9 @@
+**/*.md
+**/*.svg
+package.json
+.umi
+.umi-production
+dist
+test
+node_modules
+config

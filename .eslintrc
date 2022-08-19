@@ -1,0 +1,95 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:promise/recommended"
+  ],
+  "plugins": ["react", "import", "promise", "@typescript-eslint", "react-hooks"],
+  "parser": "@typescript-eslint/parser",
+  "settings": {
+    "react": {
+      "createClass": "createReactClass",
+      "pragma": "React",
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "camelcase": 0,
+    "no-unused-vars": 0, // 禁止出现未使用过的变量（与typescript规则重复）
+    "no-undef": 0, // 禁用未声明的变量，除非它们在 /*global */ 注释中被提到 （原因：全局变量较常用，定义在global.d.ts中即可）
+    "prefer-const": 2, // 要求使用 const 声明那些声明后不再被修改的变量
+    "one-var-declaration-per-line": 2, // 禁止一次性定义多个变量
+    "no-inner-declarations": 1, // 禁止在嵌套的块中出现变量声明或 function 声明  --CUSTOM
+
+    "@typescript-eslint/explicit-function-return-type": 0, // 对返回类型不明确的函数必须声明类型
+    "@typescript-eslint/no-use-before-define": 0, // 在定义变量和函数之前禁止使用
+    "@typescript-eslint/no-inferrable-types": 0, // 不允许对初始化为数字，字符串或布尔值的变量或参数进行显式类型声明
+    "indent": [
+      2,
+      2,
+      {
+        // 缩进
+        "FunctionDeclaration": {
+          "body": 1,
+          "parameters": 2
+        },
+        "SwitchCase": 1
+      }
+    ],
+    "jsx-quotes": [2, "prefer-single"],
+    "react/jsx-key": "off",
+    "react/react-in-jsx-scope": "off",
+    "react/jsx-closing-tag-location": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/naming-convention": "off",
+    "@typescript-eslint/type-annotation-spacing": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "arrow-body-style": ["off"],
+    "react/no-multi-comp": ["off"],
+    "require-atomic-updates": "off",
+    "import/order": 2, // import引入按照一定顺序
+    "import/no-default-export": "off", // 规则是好规则，但是某些场景下必须使用 export default，例如现在的路由插件，必须 export default
+    "import/no-unresolved": "off", // 和模块解析有关，如果本地文件中没有这个文件，则会报错，webpack 会省略后缀，并不适合
+    "@typescript-eslint/no-var-requires": 0, // 禁止var foo = require("foo"）用import代替
+    "@typescript-eslint/no-non-null-assertion": 0, // 禁止使用!的非null断言后缀运算符
+    "@typescript-eslint/no-explicit-any": 0, // 禁止使用any类型
+    "@typescript-eslint/no-angle-bracket-type-assertion": 0, // 禁止使用尖括号范型
+    // ============React规则=============
+    "react/default-props-match-prop-types": 1, // 有默认值的属性必须在propTypes中指定  --CUSTOM
+    "react/no-array-index-key": 1, // 不要使用数组索引作为key，尽可能使用ID
+    "react/no-unused-prop-types": 1, // 禁止未使用的prop参数
+    "react/prefer-es6-class": 1, // 强制使用es6 extend方法创建组件
+    "react/require-default-props": "off", // 有人喜欢函数默认值的形式而非 defaultProps，会有大量警告
+    "react/self-closing-comp": 1, // 没有children的组件和html必须使用自闭和标签
+    "react/sort-comp": 1, // 对组件的方法排序
+    "react/sort-prop-types": 1, // 对prop排序
+    "react/style-prop-object": 1, // 组件参数如果是style，value必须是object
+    "react/jsx-boolean-value": 1, // 属性值为true的时候，省略值只写属性名
+    "react/jsx-equals-spacing": 1, // 属性赋值不允许有空格
+    "react/jsx-first-prop-new-line": 1, // 只有一个属性情况下单行
+    "react/jsx-max-props-per-line": "off", // 如果每个 jsx 每个属性必须换行，就会显得代码过长
+    "react/jsx-no-comment-textnodes": 1, // 检查jsx注释
+    "react/jsx-pascal-case": 1, // 检查jsx标签名规范
+    "react/jsx-wrap-multilines": [
+      1,
+      {
+        "declaration": "parens-new-line",
+        "assignment": "parens-new-line",
+        "return": "parens-new-line",
+        "arrow": "ignore",
+        "condition": "ignore",
+        "logical": "ignore",
+        "prop": "ignore"
+      }
+    ],
+    "react/prop-types": "off", // 必须使用 propTypes 进行类型校检，因为有了 ts 就没必要了
+    "react-hooks/rules-of-hooks": 2, // 检查 Hook 的规则
+    "react-hooks/exhaustive-deps": 0 // 检查 Effect 的依赖（autofix时会自动添加依赖，不安全，故关掉） --CUSTOM
+  }
+}

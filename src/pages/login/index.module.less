@@ -1,0 +1,87 @@
+.login_container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  min-width: 1024px;
+  background-color: #d9eaff;
+}
+
+.left_panel,
+.right_panel {
+  width: 50%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.left_panel {
+}
+
+.right_panel {
+  position: relative;
+}
+
+.illustration {
+  margin-top: 14rem;
+  width: 600px;
+}
+
+.title {
+  color: rgb(15, 19, 224);
+  font-size: 40px;
+  font-weight: 700;
+}
+
+.login {
+  margin-top: 20rem;
+  width: 300px;
+  min-height: 300px;
+  padding: 10px 25px 20px 25px;
+  position: relative;
+  background-color: #fff;
+  border-radius: 10px;
+  box-sizing: content-box;
+  :global {
+    .mp-antd-tabs-nav-list {
+      margin-bottom: 8px;
+    }
+    .mp-antd-tabs-tab {
+      padding: 6px 0;
+    }
+    .mp-antd-tabs-tab-btn {
+      font-weight: 700;
+      font-size: 20px;
+    }
+    .mp-antd-tabs-nav {
+      &::before {
+        border-bottom: 0;
+      }
+    }
+    .mp-antd-tabs-ink-bar {
+      height: 4px !important;
+      border-radius: 2px;
+    }
+  }
+}
+
+.label {
+  display: inline-block;
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: #222;
+  font-weight: 500;
+}
+
+.login_button {
+  width: 100%;
+}
+
+.actions {
+  margin-top: 10px;
+  &_start {
+    float: left;
+  }
+  &_end {
+    float: right;
+  }
+}

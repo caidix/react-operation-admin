@@ -1,0 +1,22 @@
+@import '~@src/style/var.less';
+@import '~@src/style/mixin.less';
+
+.brand {
+  width: 178px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+
+  &_img {
+    height: 32px;
+    width: 32px;
+  }
+
+  &_text {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff;
+    margin-left: 12px;
+    .single-ellipsis;
+  }
+}
