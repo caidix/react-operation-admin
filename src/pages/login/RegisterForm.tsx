@@ -1,24 +1,95 @@
 import React from 'react';
-import { Button, Tabs, Form, Input, Row, Col } from 'antd';
+import { Button, Tabs, Form, Input, Modal, Col, message } from 'antd';
 import StrengthMeter from '@src/components/StrengthMeter';
+import CountInput from '@src/components/CountDown/CountInput';
+import { getEmailVerifyCode, register } from '@src/api/user';
+import { IRegisterReq } from '@src/api/user/types';
+import { useBoolean } from 'ahooks';
+import { TabsEnum } from './types';
 import styles from './index.module.less';
 
-const UserLogin = () => {
-  const onFinish = (values: any) => {
-    console.log('Received values of form: ', values);
+interface UserRegisterProps {
+  changeTabs: (value: TabsEnum) => void;
+}
+
+const UserRegister: React.FC<UserRegisterProps> = (props) => {
+  const [form] = Form.useForm();
+  const [isLoading, LoadingFn] = useBoolean();
+
+  const fetchverifyCode = async () => {
+    try {
+      const data = await form.validateFields(['email']);
+      await getEmailVerifyCode(data);
+      message.success('已发送邮件');
+      return true;
+    } catch (error) {
+      return false;
+    }
   };
+
+  const registerUser = async (values: IRegisterReq) => {
+    LoadingFn.setTrue();
+    console.log('Received values of form: ', values);
+    try {
+      await register(values);
+      message.success('注册成功');
+      form.resetFields();
+      props.changeTabs(TabsEnum.Login);
+    } catch (error) {
+      return false;
+    } finally {
+      LoadingFn.setFalse();
+    }
+  };
+
   return (
-    <Form wrapperCol={{ span: 24 }} size='large' name='normal_login' onFinish={onFinish}>
+    <Form
+      wrapperCol={{ span: 24 }}
+      form={form}
+      size='large'
+      name='normal_login'
+      disabled={isLoading}
+      onFinish={registerUser}
+    >
       <Form.Item name='name' rules={[{ required: true, message: '请输入用户名' }]}>
         <Input placeholder='用户名' />
       </Form.Item>
-      <Form.Item name='prePassword' rules={[{ required: true, message: '请输入密码' }]}>
+      <Form.Item
+        name='email'
+        rules={[
+          { required: true, message: '请输入邮箱' },
+          {
+            type: 'email',
+            message: '邮箱格式有误',
+          },
+        ]}
+      >
+        <Input placeholder='邮箱' />
+      </Form.Item>
+      <Form.Item name='verifyCode' dependencies={['email']} rules={[{ required: true, message: '请输入验证码' }]}>
+        <CountInput placeholder='验证码，5分钟内有效' countProps={{ beforeStartFunc: fetchverifyCode }} />
+      </Form.Item>
+      <Form.Item name='password' rules={[{ required: true, message: '请输入密码' }]}>
         <StrengthMeter placeholder='密码' />
       </Form.Item>
-      <Form.Item name='nextPassword' rules={[{ required: true, message: '请输入密码' }]}>
+      <Form.Item
+        name='nextPassword'
+        dependencies={['password']}
+        rules={[
+          { required: true, message: '请再次输入密码' },
+          ({ getFieldValue }) => ({
+            validator(_, value) {
+              if (!value || getFieldValue('password') === value) {
+                return Promise.resolve();
+              }
+              return Promise.reject(new Error('两次输入密码不一致'));
+            },
+          }),
+        ]}
+      >
         <Input.Password placeholder='确认密码' />
       </Form.Item>
-      <Button type='primary' htmlType='submit' className={styles.login_button}>
+      <Button type='primary' htmlType='submit' loading={isLoading} className={styles.login_button}>
         注册
       </Button>
       <div className={styles.actions}>
@@ -37,4 +108,4 @@ const UserLogin = () => {
   );
 };
 
-export default UserLogin;
+export default UserRegister;

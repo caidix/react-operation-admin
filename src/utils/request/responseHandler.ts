@@ -1,4 +1,4 @@
-import { Button, message as Message } from 'antd';
+import { Button, message } from 'antd';
 import { store } from '@src/store';
 import { setLogout } from '@src/store/user';
 import { IAxiosError, IAxiosResponse } from './types';
@@ -10,11 +10,11 @@ const responseHandler = () => ({
     if (!isResponseHandle) {
       return data;
     }
+
     const errCode = data.code;
     if (errCode) {
-      Message.error({
-        content: data.message,
-      });
+      console.log('response data', data.message);
+      message.error(data.message);
       throw data.message;
     }
 
@@ -29,28 +29,28 @@ const responseHandler = () => ({
     }
     if (!error.response) {
       // 极端情况下
-      Message.error({
+      message.error({
         content: error.message || '请求发生错误, 请稍后再试',
       });
       return Promise.reject(error);
     }
     const data = error.response.data || {};
     if (error.response.status === 404) {
-      Message.error({
+      message.error({
         content: '请求的接口没有找到！请联系开发查看',
       });
     } else if (error.response.status === 403) {
-      Message.error({
+      message.error({
         content: 'Forbidden：' + data?.message || '',
       });
       /** 未登录，移除缓存 - 跳转登录页 */
     } else if (error.response.status === 401) {
-      Message.error({
+      message.error({
         content: '用户未登录或登录态失效,请重新登录',
       });
       store.dispatch(setLogout({}));
     } else {
-      Message.error({
+      message.error({
         content: data?.message || '',
       });
     }

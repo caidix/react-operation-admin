@@ -1,13 +1,15 @@
-import React from 'react';
-import { Button, Tabs, Form, Input, Row, Col } from 'antd';
+import React, { useState } from 'react';
+import { Tabs } from 'antd';
 import LoginIllustration from '@src/assets/svg/login_Illustration.svg';
 import UserLogin from './LoginForm';
 import UserRegister from './RegisterForm';
 import styles from './index.module.less';
+import { TabsEnum } from './types';
 
 const { TabPane } = Tabs;
 
-const Login = () => {
+const LoginPanel: React.FC = () => {
+  const [currentTab, setCurrentTab] = useState(TabsEnum.Login);
   return (
     <div className={styles.login_container}>
       <div className={styles.left_panel}>
@@ -16,12 +18,12 @@ const Login = () => {
       </div>
       <div className={styles.right_panel}>
         <div className={styles.login}>
-          <Tabs defaultActiveKey='1' tabBarGutter={20}>
-            <TabPane tab='登录' key='1'>
-              <UserLogin />
+          <Tabs activeKey={currentTab} onChange={(key) => setCurrentTab(key as TabsEnum)} tabBarGutter={20}>
+            <TabPane tab='登录' key={TabsEnum.Login}>
+              <UserLogin key={TabsEnum.Login} />
             </TabPane>
-            <TabPane tab='注册' key='2'>
-              <UserRegister />
+            <TabPane tab='注册' key={TabsEnum.Register}>
+              <UserRegister key={TabsEnum.Register} changeTabs={setCurrentTab} />
             </TabPane>
           </Tabs>
         </div>
@@ -30,4 +32,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginPanel;

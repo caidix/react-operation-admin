@@ -3,18 +3,21 @@ import { Button, Tabs, Form, Input, Row, Col } from 'antd';
 import { login } from '@src/api/user';
 import { setLogin } from '@src/store/user';
 import { requestExecute } from '@src/utils/request/utils';
-import { useLocation, useMatch, useParams, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import useRouter from '@src/hooks/use-router';
+import { useBoolean } from 'ahooks';
 import styles from './index.module.less';
 
 const UserLogin = () => {
   const { navigate, query } = useRouter();
+  const [isLoading, LoadingFn] = useBoolean();
   const dispatch = useDispatch();
   console.log({ location, query });
 
   const onFinish = async (values: any) => {
+    LoadingFn.setTrue();
     const [_, res] = await requestExecute(login, values);
+    LoadingFn.setFalse();
     const { user, token } = res;
     if (token.accessToken) {
       const from = query.from || '/';
@@ -33,6 +36,7 @@ const UserLogin = () => {
       wrapperCol={{ span: 24 }}
       initialValues={{ name: 'admin', password: '123456' }}
       size='large'
+      disabled={isLoading}
       onFinish={onFinish}
     >
       <Form.Item name='name' rules={[{ required: true, message: '请输入用户名' }]}>
@@ -41,7 +45,7 @@ const UserLogin = () => {
       <Form.Item name='password' rules={[{ required: true, message: '请输入密码' }]}>
         <Input.Password placeholder='请输入密码' />
       </Form.Item>
-      <Button type='primary' htmlType='submit' className={styles.login_button}>
+      <Button type='primary' htmlType='submit' loading={isLoading} className={styles.login_button}>
         登录
       </Button>
       <div className={styles.actions}>

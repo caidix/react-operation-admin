@@ -1,18 +1,22 @@
-import React, { ChangeEvent, useMemo } from 'react';
+import React, { ChangeEvent, forwardRef, useImperativeHandle, useMemo } from 'react';
 import { Input, InputProps } from 'antd';
 import { zxcvbn } from '@zxcvbn-ts/core';
 import styles from './index.module.less';
 
 const { Password } = Input;
 
-export type IStrengthMeterProps = {
+export type StrengthMeterProps = {
   value?: string;
   disabled?: boolean;
   showInput?: boolean;
   onChange?: (e: string) => void;
 } & InputProps;
 
-const StrengthMeter: React.FC<IStrengthMeterProps> = (props) => {
+export type StrengthMeterRefProps = {
+  strength: number; // 强度值
+};
+
+const StrengthMeter = forwardRef<StrengthMeterRefProps, StrengthMeterProps>((props, ref) => {
   const { value, disabled, onChange, showInput = true, ...attrs } = props;
 
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -27,6 +31,10 @@ const StrengthMeter: React.FC<IStrengthMeterProps> = (props) => {
     return score;
   }, [value, disabled]);
 
+  useImperativeHandle(ref, () => ({
+    strength: passwordStrength,
+  }));
+
   return (
     <div className={styles.relative}>
       {showInput && <Password value={value} onChange={handleChange} disabled={disabled} {...attrs} />}
@@ -35,6 +43,7 @@ const StrengthMeter: React.FC<IStrengthMeterProps> = (props) => {
       </div>
     </div>
   );
-};
+});
 
+StrengthMeter.displayName = 'StrengthMeter';
 export default StrengthMeter;
