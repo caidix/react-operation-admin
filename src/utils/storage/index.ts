@@ -1,46 +1,63 @@
-interface ProxyStorage {
-  getItem(key: string): any;
-  setItem(Key: string, value: string): void;
-  removeItem(key: string): void;
-  clear(): void;
+export interface IStorage extends Storage {
+  hasItem(key: string): boolean;
 }
 
-//sessionStorage operate
-class sessionStorageProxy implements ProxyStorage {
-  protected storage: ProxyStorage;
-
-  constructor(storageModel: ProxyStorage) {
-    this.storage = storageModel;
+export class StorageDecorator implements IStorage {
+  /**
+   * 键值对的数量
+   */
+  get length() {
+    return this.storage.length;
   }
 
-  // 存
-  public setItem(key: string, value: any): void {
-    this.storage.setItem(key, JSON.stringify(value));
+  private readonly storage: Storage;
+  constructor(storage: Storage) {
+    this.storage = storage;
   }
 
-  // 取
-  public getItem(key: string): any {
-    return JSON.parse(this.storage.getItem(key));
+  /**
+   * 返回键对应的值
+   * @param index
+   */
+  public key(index: number): string | null {
+    return this.storage.key(index);
   }
 
-  // 删
-  public removeItem(key: string): void {
-    this.storage.removeItem(key);
+  setItem(key: string, value: any): void {
+    try {
+      const serialized = JSON.stringify(value);
+      this.storage.setItem(key, serialized);
+    } catch (e) {
+      this.storage.setItem(key, value);
+    }
   }
 
-  // 清空
-  public clear(): void {
+  clear(): void {
     this.storage.clear();
   }
-}
 
-//localStorage operate
-class localStorageProxy extends sessionStorageProxy implements ProxyStorage {
-  constructor(localStorage: ProxyStorage) {
-    super(localStorage);
+  getItem(key: string): any {
+    const ret = this.storage.getItem(key);
+    try {
+      return JSON.parse(ret!);
+    } catch (e) {
+      return ret;
+    }
+  }
+
+  hasItem(key: string): boolean {
+    return this.storage.getItem(key) !== null;
+  }
+
+  removeItem(key: string): void {
+    this.storage.removeItem(key);
   }
 }
 
-export const storageSession = new sessionStorageProxy(sessionStorage);
+export const LocalStorage = new StorageDecorator(window.localStorage);
+export const SessionStorage = new StorageDecorator(window.sessionStorage);
 
-export const storageLocal = new localStorageProxy(localStorage);
+export default {
+  localStorage: LocalStorage,
+  sessionStorage: SessionStorage,
+};

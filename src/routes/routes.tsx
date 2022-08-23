@@ -3,6 +3,7 @@ import { RouteObject, useRoutes } from 'react-router-dom';
 import PageLayout from '@src/layout/PageLayout';
 import HomePage from '@src/pages/home';
 import Login from '@src/pages/login';
+import UserGroupManagement from '@src/pages/user-center/user-group-management';
 import { RoutePath } from './config';
 import Auth from './util';
 export interface IRouteConfig extends RouteObject {
@@ -22,7 +23,10 @@ const routes: IRouteConfig[] = [
       icon: '',
       name: '首页',
     },
-    children: [{ path: RoutePath.HOME_PAGE, element: <HomePage /> }],
+    children: [
+      { path: RoutePath.HOME_PAGE, element: <HomePage /> },
+      { path: RoutePath.USER_GROUP_MANAGEMENT, element: <UserGroupManagement /> },
+    ],
   },
   { path: '/user', meta: { auth: false }, element: <HomePage /> },
   { path: RoutePath.LOGIN, meta: { auth: false }, element: <Login /> },

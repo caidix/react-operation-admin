@@ -1,0 +1,39 @@
+@import '~@src/style/var.less';
+
+.tip_text {
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.45);
+  margin-bottom: 5px;
+}
+
+.btns {
+  margin-top: 5px;
+  display: flex;
+  padding: 4px 16px;
+  justify-content: space-between;
+}
+
+.list {
+  &_title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 32px;
+  }
+
+  &_container {
+    border-bottom: 1px solid @gray-2;
+    margin-bottom: 5px;
+    padding: 10px 0;
+  }
+
+  &_overlay {
+    :global {
+      .svip-tenant-user-center-popover-inner-content {
+        width: 200px;
+        padding: 0px;
+        padding-bottom: 8px;
+      }
+    }
+  }
+}
