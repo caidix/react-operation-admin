@@ -5,4 +5,6 @@ export class RoutePath {
   static LOGIN = '/login';
 
   static readonly USER_GROUP_MANAGEMENT = `${this.BASE_PREFIX}/user-group-management`;
+
+  static ROOT_WHITE_PATH = [RoutePath.LOGIN];
 }

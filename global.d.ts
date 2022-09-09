@@ -23,9 +23,9 @@ declare namespace UTILS {
 }
 
 declare interface IPagination {
-  page: string | number;
-  page_size: string | number;
-  total_rows?: string | number;
+  page?: number;
+  size?: number;
+  total?: string | number;
 }
 
 declare global {

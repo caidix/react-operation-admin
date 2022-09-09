@@ -1,10 +1,3 @@
-/*
- * @Author: abcpan
- * @Date: 2021-03-27 00:48:29
- * @LastEditTime: 2021-09-23 15:05:37
- * @LastEditors: abcpan
- * @Description:
- */
 /**
  * 路由路径配置
  */
@@ -13,17 +6,17 @@ export class PlatformConsts {
     throw new Error("can't instantiate this class!");
   }
   // 子应用路由激活前缀
-  static readonly MICRO_APP_ACTIVE_RULE_PREFIX = "/user/micro";
+  static readonly MICRO_APP_ACTIVE_RULE_PREFIX = '/user/micro';
   // 子应用挂载点id
-  static readonly MICRO_APP_MOUNT_ID = "micro-container";
+  static readonly MICRO_APP_MOUNT_ID = 'micro-container';
 
-  static readonly MAIN_CONTENT_MOUNTED_ID = "main-container";
+  static readonly MAIN_CONTENT_MOUNTED_ID = 'main-container';
   // 本应用编码
-  static readonly APP_PLATFORM_CODE = "fe-op";
+  static readonly APP_PLATFORM_CODE = 'fe-op';
   // 头部限制应用组数量
   static readonly DEFAULT_GROUP_LIMIT = 10;
   // 路由框架前缀
-  static readonly ROUTE_FRAME_PREFIX = "/user";
+  static readonly ROUTE_FRAME_PREFIX = '/user';
 }
 
 /**
@@ -33,9 +26,9 @@ export class RouteURL {
   constructor() {
     throw new Error("can't instantiate this class!");
   }
-  static readonly ROOT = "/";
+  static readonly ROOT = '/';
   // 登录页
-  static readonly LOGIN_PAGE = "/login";
+  static readonly LOGIN_PAGE = '/login';
   // 首页
   static readonly HOME_PAGE = `${PlatformConsts.ROUTE_FRAME_PREFIX}/home`;
 

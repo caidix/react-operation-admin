@@ -1,4 +1,3 @@
-import routes from '@src/routes/routes';
 import { Layout, Menu, Spin } from 'antd';
 import React, { FC, useEffect } from 'react';
 import { DesktopOutlined, FileOutlined, PieChartOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
@@ -18,6 +17,8 @@ import Brand from './components/Brand';
 import Actions from './components/Actions';
 
 import styles from './index.module.less';
+import LayoutMenu from './components/Menu';
+import { PlatformConsts } from '@src/consts';
 
 const { Header, Sider, Content } = Layout;
 
@@ -88,10 +89,13 @@ const PageLayout: FC = (props: IProps) => {
       </Header>
       <Layout className={styles.layout_body}>
         <Sider theme='light'>
-          <Menu className={styles.sidebar_menu} mode='inline' items={items}></Menu>
+          <LayoutMenu></LayoutMenu>
         </Sider>
         <Content>
-          <Outlet />
+          <div id={PlatformConsts.MAIN_CONTENT_MOUNTED_ID}>
+            <Outlet />
+          </div>
+          <div id={PlatformConsts.MICRO_APP_MOUNT_ID} />
         </Content>
       </Layout>
     </Layout>

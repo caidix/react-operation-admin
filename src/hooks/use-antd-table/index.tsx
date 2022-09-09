@@ -122,13 +122,13 @@ const useAntdTable = <TData extends Data, TParams extends Params>(
 
   const reset = (params?: ResetParams) => {
     if (form) {
-      const { include = [], exclude = ['roleSystemId'] } = params || {};
+      const { include = [], exclude = [] } = params || {};
       const keys = getCurrentNamePath();
-      if (include.length) {
-        form.resetFields(include);
-      } else {
-        form.resetFields(keys.filter((key) => !exclude.includes(key)));
-      }
+      form.resetFields(keys.filter((key) => !exclude.includes(key)));
+      // if (include.length) {
+      //   form.resetFields(include);
+      // } else {
+      // }
     }
     _submit();
   };

@@ -1,0 +1,37 @@
+// 侧边栏布局 固定
+.sidebar {
+  padding-top: 8px;
+  overflow-y: auto;
+  overflow-x: auto;
+  box-shadow: 2px 0 6px 0 rgba(0, 21, 41, 0.12);
+  :global {
+    .mp-antd-layout-sider-children {
+      height: auto !important;
+    }
+    .mp-antd-menu-item,
+    .mp-antd-menu-submenu-title {
+      span {
+        vertical-align: middle;
+      }
+    }
+
+    .mp-antd-menu-item-icon {
+      margin-right: 5px !important;
+    }
+
+    .mp-antd-menu-submenu-title {
+      img,
+      div {
+        margin-right: 5px;
+      }
+    }
+    // 触发区域阴影
+    .mp-antd-layout-sider-trigger {
+      box-shadow: 0 -2px 6px 0 rgba(0, 21, 41, 0.12);
+    }
+  }
+
+  &_menu {
+    border-right: none;
+  }
+}

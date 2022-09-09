@@ -4,6 +4,7 @@ import styles from './style.module.less';
 
 interface IProps {
   split?: ReactNode;
+  children?: ReactNode;
   style?: CSSProperties;
   type?: 'button' | 'text';
 }

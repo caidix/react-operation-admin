@@ -15,7 +15,7 @@ export interface IRouteConfig extends RouteObject {
   children?: IRouteConfig[];
 }
 
-const routes: IRouteConfig[] = [
+export const routes: IRouteConfig[] = [
   {
     path: '/',
     element: <PageLayout />,
@@ -25,11 +25,10 @@ const routes: IRouteConfig[] = [
     },
     children: [
       { path: RoutePath.HOME_PAGE, element: <HomePage /> },
-      { path: RoutePath.USER_GROUP_MANAGEMENT, element: <UserGroupManagement /> },
+      { path: RoutePath.USER_GROUP_MANAGEMENT, element: <UserGroupManagement />, meta: { name: '用户组管理' } },
     ],
   },
-  { path: '/user', meta: { auth: false }, element: <HomePage /> },
-  { path: RoutePath.LOGIN, meta: { auth: false }, element: <Login /> },
+  { path: RoutePath.LOGIN, meta: { auth: false, name: '登录' }, element: <Login /> },
 ];
 
 function renderRoutes(routes: IRouteConfig[]) {
