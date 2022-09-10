@@ -1,10 +1,14 @@
 import http from '@src/utils/request';
-import { IOrganizationListReq } from './types';
+import { IOrganizationListReq, IOrganizationListResp } from './types';
 
 export const getOrganizationList = (params: IOrganizationListReq) => {
-  return http.get('/organization/list', params);
+  return http.get<IOrganizationListResp>('/organization/list', params);
 };
 
 export const postCreateOrganization = (data = {}) => {
   return http.post('/organization/create-organization', data);
+};
+
+export const postUpdateOrganization = (data = {}) => {
+  return http.post('/organization/update-organization', data);
 };

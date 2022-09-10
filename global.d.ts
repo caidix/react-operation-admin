@@ -25,7 +25,7 @@ declare namespace UTILS {
 declare interface IPagination {
   page?: number;
   size?: number;
-  total?: string | number;
+  total?: number;
 }
 
 declare global {

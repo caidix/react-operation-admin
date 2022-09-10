@@ -146,7 +146,7 @@ function CustomTable<T>(props: TableProps<any>, ref: React.Ref<HTMLDivElement>) 
       };
     });
   }, [columns]);
-  return <Table ref={ref} {...props} columns={newColumns} />;
+  return <Table rowKey='id' ref={ref} {...props} columns={newColumns} />;
 }
 
 CustomTable.displayName = 'CustomTable';

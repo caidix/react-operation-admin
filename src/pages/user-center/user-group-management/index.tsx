@@ -6,29 +6,57 @@ import useAntdTable from '@src/hooks/use-antd-table';
 import NumberInput from '@src/components/NumberInput';
 import ColumnSetting, { ColumnSettingProps } from '@src/components/ColumnsFilter/Filter';
 import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
+import { getOrganizationList } from '@src/api/user-center/user-group-management';
 import { FilterColumnType } from '@src/components/ColumnsFilter';
 import CustomTable from '@src/components/CustomTable';
+import { useSetState } from 'ahooks';
+import { requestExecute } from '@src/utils/request/utils';
+import { EMPTY_TABLE } from '@src/consts';
+import EditGroupModal from './components/EditGroupModal';
 import { getColumns } from './config';
+
+interface AppModelInfo {
+  visible: boolean;
+  data: null | UserGroupItem;
+}
 
 const UserGroupManagement: React.FC = () => {
   const [form] = Form.useForm();
+  /* 新增编辑弹窗 */
+  const [appModalInfo, setModalInfo] = useSetState<AppModelInfo>({
+    visible: false,
+    data: null,
+  });
+
+  const changeModelInfo = (data: null | UserGroupItem = null) => {
+    setModalInfo({
+      visible: !appModalInfo.visible,
+      data,
+    });
+  };
+
   const { tableProps, search } = useAntdTable(
     async ({ current, pageSize }, formData: any) => {
-      // const [err, res] = await ;
-      // if (err) {
-      //   message.error(err.message);
-      //   return EMPTY_TABLE;
-      // }
+      const [err, res] = await requestExecute(getOrganizationList, {
+        size: pageSize,
+        page: current,
+      });
+      if (err) {
+        message.error(err.message);
+        return EMPTY_TABLE;
+      }
       return {
-        list: [],
-        total: 10 || 0,
+        list: res.list,
+        total: res.total || 0,
       };
     },
     { defaultPageSize: 10, form },
   );
 
   /** 基础编辑操作 */
-  function handleBaseActions(record: UserGroupItem) {}
+  function handleBaseActions(record: UserGroupItem) {
+    changeModelInfo(record);
+  }
 
   const columns = getColumns({ handleBaseActions });
   const [curColumns, setCurColumns] = useState<FilterColumnType<any>[]>(columns);
@@ -60,13 +88,13 @@ const UserGroupManagement: React.FC = () => {
       </Row>
     </Form>
   );
-  const changeModelInfo = () => {};
+
   return (
     <ContainerLayout title='用户组管理' header={Header}>
       <PageHeader
         rightCtn={
           <>
-            <Button onClick={() => changeModelInfo()} className='mr-8' type='primary'>
+            <Button onClick={() => changeModelInfo()} className='mr-2' type='primary'>
               新增
             </Button>
             <ColumnSetting {...filterProps} />
@@ -74,6 +102,14 @@ const UserGroupManagement: React.FC = () => {
         }
       />
       <CustomTable columns={curColumns} scroll={{ x: 1500 }} {...tableProps} />
+      <EditGroupModal
+        {...appModalInfo}
+        onConfirm={() => {
+          changeModelInfo();
+          reload();
+        }}
+        onClose={changeModelInfo}
+      />
     </ContainerLayout>
   );
 };

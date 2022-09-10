@@ -1,7 +1,3 @@
-export type IOrganizationListReq = {
-  name?: string;
-} & IPagination;
-
 export interface UserGroupItem {
   id: number;
   name: string;
@@ -15,3 +11,11 @@ export interface UserGroupItem {
   updateTime: string;
   deleteTime: string;
 }
+
+export type IOrganizationListReq = {
+  name?: string;
+} & IPagination;
+
+export type IOrganizationListResp = {
+  list: UserGroupItem[];
+} & IPagination;

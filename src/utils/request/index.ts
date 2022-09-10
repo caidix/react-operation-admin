@@ -63,7 +63,7 @@ class HTTP {
   }
 
   /** 只为统一get， post的书写格式，不做额外逻辑，额外逻辑在handler内管理 */
-  request(method: string, url: string, data: any, config: IAxiosRequestConfig) {
+  request<T>(method: string, url: string, data: any, config: IAxiosRequestConfig): Promise<T> {
     this.addHeader(config.headers || {});
     const req = method === HTTP.GET ? { params: data } : { data };
 
@@ -75,12 +75,12 @@ class HTTP {
     return this.axios.request(msg);
   }
 
-  get(url: string, params = {}, config = {}) {
-    return this.request(HTTP.GET, url, params, config);
+  get<T>(url: string, params = {}, config = {}) {
+    return this.request<T>(HTTP.GET, url, params, config);
   }
 
-  post(url: string, data = {}, config = {}): Promise<any> {
-    return this.request(HTTP.POST, url, data, config);
+  post<T>(url: string, data = {}, config = {}): Promise<any> {
+    return this.request<T>(HTTP.POST, url, data, config);
   }
 }
 

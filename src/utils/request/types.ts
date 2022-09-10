@@ -12,18 +12,19 @@ export interface RequestConfig extends AxiosRequestConfig {
 export type IAxiosRequestConfig = AxiosRequestConfig<any> & {
   isResponseHandle?: boolean;
   handleError?: boolean;
+  tipErr?: boolean;
 };
 
-export type IAxiosResponseData = {
+export type IAxiosResponseData<T> = {
   code?: number;
-  data?: any;
+  data?: T;
   message?: string;
   url?: string;
 };
 
-export type IAxiosResponse = {
-  config: IAxiosRequestConfig;
-} & AxiosResponse<IAxiosResponseData>;
+export type IAxiosResponse<T = any> = {
+  config?: IAxiosRequestConfig;
+} & AxiosResponse<IAxiosResponseData<T>>;
 
 export type IAxiosError = {
   config: IAxiosRequestConfig;
@@ -40,7 +41,7 @@ export interface DebounceQueue {
 export interface HandlerFunction {
   requestResolve?: (value: IAxiosRequestConfig) => IAxiosRequestConfig | Promise<IAxiosRequestConfig>;
   requestReject?: (error: IAxiosError) => any;
-  responseResolve?: (value: IAxiosResponse) => IAxiosResponse | Promise<IAxiosResponse>;
+  responseResolve?: (value: IAxiosResponse) => IAxiosResponse | Promise<IAxiosResponse> | Promise<any>;
   responseReject?: (error: IAxiosError) => any;
 }
 

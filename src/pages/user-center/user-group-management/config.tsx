@@ -1,6 +1,7 @@
 import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
 import Split from '@src/components/Split';
 import { Button } from 'antd';
+import React from 'react';
 export enum SupportGroupEnum {
   Default = 1,
   Support = 2,
@@ -18,9 +19,7 @@ export enum ColumnEnum {
   Description = 'desc',
   /** 显示状态 */
   Managers = 'managers',
-  /** 支持自定义分组 */
   Users = 'users',
-  /** 支持自定义角色 */
   Systems = 'systems',
   /** logo */
   IsDelete = 'isDelete',

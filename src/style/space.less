@@ -1,0 +1,71 @@
+@mpStep: 4;
+@mpUnit: px;
+
+.generate-padding-and-margin(@i, @k: 1) when (@k =< @i) {
+  @calculatedSize: @k * @mpStep * 1px;
+  @calculatedSizeNegative: -1px * @k * @mpStep;
+
+  .p-@{k} {
+    padding: @calculatedSize;
+  }
+  .pr-@{k} {
+    padding-right: @calculatedSize;
+  }
+  .pl-@{k} {
+    padding-left: @calculatedSize;
+  }
+  .pt-@{k} {
+    padding-top: @calculatedSize;
+  }
+  .pb-@{k} {
+    padding-bottom: @calculatedSize;
+  }
+  .px-@{k} {
+    padding-left: @calculatedSize;
+    padding-right: @calculatedSize;
+  }
+  .py-@{k} {
+    padding-top: @calculatedSize;
+    padding-bottom: @calculatedSize;
+  }
+
+  .m-@{k} {
+    margin: @calculatedSize;
+  }
+  .mr-@{k} {
+    margin-right: @calculatedSize;
+  }
+  .ml-@{k} {
+    margin-left: @calculatedSize;
+  }
+  .mt-@{k} {
+    margin-top: @calculatedSize;
+  }
+  .mb-@{k} {
+    margin-bottom: @calculatedSize;
+  }
+  .mx-@{k} {
+    margin-left: @calculatedSize;
+    margin-right: @calculatedSize;
+  }
+  .my-@{k} {
+    margin-top: @calculatedSize;
+    margin-bottom: @calculatedSize;
+  }
+
+  .mr-@{k}-minus {
+    margin-right: @calculatedSizeNegative;
+  }
+  .ml-@{k}-minus {
+    margin-left: @calculatedSizeNegative;
+  }
+  .mt-@{k}-minus {
+    margin-top: @calculatedSizeNegative;
+  }
+  .mb-@{k}-minus {
+    margin-bottom: @calculatedSizeNegative;
+  }
+
+  .generate-padding-and-margin(@i, @k + 1);
+}
+.generate-padding-and-margin(20);

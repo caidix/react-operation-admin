@@ -5,7 +5,7 @@ import { IAxiosError, IAxiosResponse } from './types';
 import { HttpError } from './utils';
 const responseHandler = () => ({
   responseResolve(response: IAxiosResponse) {
-    const { isResponseHandle = true } = response.config;
+    const { isResponseHandle = true, tipErr = true } = response.config || {};
     const data = response.data || {};
     if (!isResponseHandle) {
       return data;
@@ -13,8 +13,8 @@ const responseHandler = () => ({
 
     const errCode = data.code;
     if (errCode) {
-      console.log('response data', data.message);
-      message.error(data.message);
+      console.log('response data', data.message, tipErr);
+      tipErr && message.error(data.message, 0);
       throw data.message;
     }
 
