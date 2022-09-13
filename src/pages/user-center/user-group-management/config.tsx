@@ -1,5 +1,6 @@
 import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
 import Split from '@src/components/Split';
+import { ActionCodeEnum } from '@src/consts';
 import { Button } from 'antd';
 import React from 'react';
 export enum SupportGroupEnum {
@@ -32,7 +33,7 @@ export enum ColumnEnum {
 }
 
 interface IColumnProps {
-  handleBaseActions(R: UserGroupItem): void;
+  handleBaseActions(R: UserGroupItem, code: ActionCodeEnum): void;
 }
 
 export const getColumns = ({ handleBaseActions }: IColumnProps) => {
@@ -85,12 +86,12 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
       title: '操作',
       dataIndex: ColumnEnum.BaseActions,
       key: ColumnEnum.BaseActions,
-      width: 90,
+      width: 180,
       render: (_: unknown, record: UserGroupItem) => {
         return (
           <Split type='button'>
             {baseActions.map(({ code, name }) => (
-              <Button onClick={() => handleBaseActions(record)} type='link' size='small' key={code}>
+              <Button onClick={() => handleBaseActions(record, code)} type='link' size='small' key={code}>
                 {name}
               </Button>
             ))}
@@ -104,6 +105,10 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
 export const baseActions = [
   {
     name: '编辑',
-    code: 'Edit',
+    code: ActionCodeEnum.Update,
+  },
+  {
+    name: '添加/移除用户',
+    code: ActionCodeEnum.UpdateUserList,
   },
 ];

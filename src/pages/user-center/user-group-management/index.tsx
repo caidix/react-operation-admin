@@ -11,9 +11,10 @@ import { FilterColumnType } from '@src/components/ColumnsFilter';
 import CustomTable from '@src/components/CustomTable';
 import { useSetState } from 'ahooks';
 import { requestExecute } from '@src/utils/request/utils';
-import { EMPTY_TABLE } from '@src/consts';
+import { ActionCodeEnum, EMPTY_TABLE } from '@src/consts';
 import EditGroupModal from './components/EditGroupModal';
 import { getColumns } from './config';
+import UserPicker from './components/UserPicker';
 
 interface AppModelInfo {
   visible: boolean;
@@ -27,10 +28,20 @@ const UserGroupManagement: React.FC = () => {
     visible: false,
     data: null,
   });
+  const [userPickInfo, setUserPickInfo] = useSetState<AppModelInfo>({
+    visible: false,
+    data: null,
+  });
 
   const changeModelInfo = (data: null | UserGroupItem = null) => {
     setModalInfo({
       visible: !appModalInfo.visible,
+      data,
+    });
+  };
+  const changeUserInfo = (data: null | UserGroupItem = null) => {
+    setUserPickInfo({
+      visible: !userPickInfo.visible,
       data,
     });
   };
@@ -54,8 +65,11 @@ const UserGroupManagement: React.FC = () => {
   );
 
   /** 基础编辑操作 */
-  function handleBaseActions(record: UserGroupItem) {
-    changeModelInfo(record);
+  function handleBaseActions(record: UserGroupItem, code: ActionCodeEnum) {
+    if (code === ActionCodeEnum.Update) {
+      return changeModelInfo(record);
+    }
+    changeUserInfo(record);
   }
 
   const columns = getColumns({ handleBaseActions });
@@ -109,6 +123,14 @@ const UserGroupManagement: React.FC = () => {
           reload();
         }}
         onClose={changeModelInfo}
+      />
+      <UserPicker
+        {...userPickInfo}
+        onConfirm={() => {
+          changeUserInfo();
+          reload();
+        }}
+        onClose={changeUserInfo}
       />
     </ContainerLayout>
   );

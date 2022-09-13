@@ -19,3 +19,7 @@ export type IOrganizationListReq = {
 export type IOrganizationListResp = {
   list: UserGroupItem[];
 } & IPagination;
+
+export type IOrganizationUsersReq = {
+  id?: number;
+};

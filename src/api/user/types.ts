@@ -13,3 +13,7 @@ export interface IRegisterReq {
   email: string;
   verifyCode: string;
 }
+
+export type IGetUserListReq = {
+  [propsName: string]: any;
+} & IPagination;
