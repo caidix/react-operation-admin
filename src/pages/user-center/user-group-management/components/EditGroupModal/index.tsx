@@ -4,6 +4,7 @@ import useForm from '@src/hooks/use-form';
 import { requestExecute } from '@src/utils/request/utils';
 import { postCreateOrganization, postUpdateOrganization } from '@src/api/user-center/user-group-management';
 import { ColumnEnum } from '../../config';
+import { Pattern } from '@src/utils/validate';
 
 interface IProps {
   visible: boolean;
@@ -63,7 +64,7 @@ const EditGroupModal: React.FC<IProps> = (props) => {
           name={ColumnEnum.Code}
           rules={[
             { required: true, message: '请输入组编码' },
-            { pattern: /^[a-z](([a-z]|[0-9]|_)*)$/, message: '请输入正确的用户组编码' },
+            { pattern: Pattern.LOWER_CODE_PATTER, message: '请输入正确的用户组编码' },
           ]}
           extra='用户组编码唯一，只允许小写的英文+下划线+数字，不能数字和下划线开头。'
         >

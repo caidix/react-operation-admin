@@ -8,7 +8,7 @@ type Storage = 'localStorage' | 'sessionStorage';
 
 export type ColumnsState = {
   show?: boolean;
-  fixed?: 'right' | 'left' | undefined;
+  fixed?: any;
   order?: number;
   disable?:
     | boolean
@@ -16,7 +16,7 @@ export type ColumnsState = {
         checkbox: boolean;
       };
 };
-export type FilterColumnType<T> = ColumnsState & TableColumnType<T>;
+export type FilterColumnType<T> = ColumnsState & Omit<TableColumnType<T>, 'fixed'>;
 export type UseContainerProps<T = any> = {
   columnsState?: {
     storageType: Storage;

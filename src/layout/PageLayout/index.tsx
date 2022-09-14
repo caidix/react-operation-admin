@@ -88,8 +88,8 @@ const PageLayout: FC = (props: IProps) => {
         </div>
       </Header>
       <Layout className={styles.layout_body}>
-        <Sider theme='light'>
-          <LayoutMenu></LayoutMenu>
+        <Sider theme='light' className={styles.sidebar}>
+          <LayoutMenu />
         </Sider>
         <Content>
           <div id={PlatformConsts.MAIN_CONTENT_MOUNTED_ID}>

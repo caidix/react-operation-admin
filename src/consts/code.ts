@@ -13,6 +13,8 @@ export enum ActionCodeEnum {
   SetAppAdmin = 'setAppAdmin',
   /** 编辑 */
   Update = 'update',
+  /** 删除 */
+  Delete = 'delete',
   /** 更新用户权限 */
   UpdateUserList = 'updateUserList',
 }

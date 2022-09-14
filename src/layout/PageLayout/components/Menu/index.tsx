@@ -4,7 +4,6 @@ import type { MenuProps } from 'antd';
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-import styles from './index.module.less';
 type MenuItem = Required<MenuProps>['items'][number];
 
 const LayoutMenu = () => {
@@ -21,7 +20,7 @@ const LayoutMenu = () => {
     });
   }
 
-  return <Menu className={styles.sidebar_menu} mode='inline' items={handleRoutes(routes)} />;
+  return <Menu style={{ borderRight: 'none' }} mode='inline' items={handleRoutes(routes)} />;
 };
 
 export default LayoutMenu;

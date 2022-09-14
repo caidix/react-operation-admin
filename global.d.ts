@@ -28,6 +28,13 @@ declare interface IPagination {
   total?: number;
 }
 
+
+declare interface IDateParam {
+  createTime?: string;
+  updateTime?: string;
+  deleteTime?: string;
+}
+
 declare global {
   declare interface ChangeEvent extends Event {
     target: HTMLInputElement;

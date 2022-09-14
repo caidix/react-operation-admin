@@ -6,7 +6,7 @@ export const EMPTY_TABLE = {
 export const EMPTY_SORT = '-111';
 
 export const EMPTY_OPTION = {
-  name: '全部',
+  name: '所有',
   code: '-1',
 };
 

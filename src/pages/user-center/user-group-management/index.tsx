@@ -136,4 +136,5 @@ const UserGroupManagement: React.FC = () => {
   );
 };
 
+UserGroupManagement.displayName = 'UserGroupManagement';
 export default UserGroupManagement;

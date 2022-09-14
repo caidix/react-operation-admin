@@ -52,8 +52,10 @@ export class Pattern {
 
   static CODE_PATTERN = /^[A-Za-z0-9_]*$/;
 
-  // 小写 code
+  // 英文+下划线+数字
   static LOWER_CODE_PATTER = /^[a-z](([a-z]|[0-9]|_)*)$/;
+
+  static NUMBER = /^\d+$/;
 }
 
 /**

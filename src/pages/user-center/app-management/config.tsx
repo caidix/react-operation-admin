@@ -2,28 +2,26 @@ import React from 'react';
 import { Button } from 'antd';
 import Split from '@src/components/Split';
 import { ActionCodeEnum } from '@src/consts';
-import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
-export enum SupportGroupEnum {
-  Default = 1,
-  Support = 2,
-  Unsupported = 3,
-}
-
+import { ApplicationItem } from '@src/api/user-center/app-management/types';
 export enum ColumnEnum {
-  /** 角色系统名称 */
+  /** 系统名称 */
   Name = 'name',
   /** 应用编码 */
   Code = 'code',
-  /** 角色系统ID */
+  /** 系统ID */
   Id = 'id',
   /** 描述 */
   Description = 'desc',
-  /** 显示状态 */
-  Managers = 'managers',
-  Users = 'users',
-  Systems = 'systems',
-  /** logo */
-  IsDelete = 'isDelete',
+  /** 资源地址 */
+  ResourcesUrl = 'resourcesUrl',
+  /** 组织归属 */
+  Organization = 'organization',
+  /** 访问地址 */
+  Url = 'url',
+  /** LOGO */
+  LogoUrl = 'logoUrl',
+  /** 密钥 */
+  AppSecret = 'appSecret',
   /** 创建时间 */
   CreateTime = 'createTime',
   /** 更新时间 */
@@ -33,22 +31,22 @@ export enum ColumnEnum {
 }
 
 interface IColumnProps {
-  handleBaseActions(R: UserGroupItem, code: ActionCodeEnum): void;
+  handleBaseActions(R: ApplicationItem, code: ActionCodeEnum): void;
 }
 
 export const getColumns = ({ handleBaseActions }: IColumnProps) => {
   return [
     {
-      title: 'ID',
-      dataIndex: ColumnEnum.Id,
-      key: ColumnEnum.Id,
-      width: 100,
+      title: '应用名称',
+      dataIndex: ColumnEnum.Name,
+      key: ColumnEnum.Name,
+      width: 160,
       ellipsis: true,
     },
     {
-      title: '名称',
-      dataIndex: ColumnEnum.Name,
-      key: ColumnEnum.Name,
+      title: '应用编码',
+      dataIndex: ColumnEnum.Code,
+      key: ColumnEnum.Code,
       width: 160,
       ellipsis: true,
     },
@@ -60,11 +58,22 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
       ellipsis: true,
     },
     {
-      title: '编码',
-      dataIndex: ColumnEnum.Code,
-      key: ColumnEnum.Code,
+      title: '资源地址',
+      dataIndex: ColumnEnum.ResourcesUrl,
+      key: ColumnEnum.ResourcesUrl,
       width: 160,
       ellipsis: true,
+    },
+    {
+      title: '所属用户组',
+      dataIndex: ColumnEnum.Organization,
+      key: ColumnEnum.Organization,
+      width: 160,
+      ellipsis: true,
+      render: (_: unknown, record: ApplicationItem) => {
+        console.log({ _, record });
+        return 1;
+      },
     },
     {
       title: '创建时间',
@@ -86,8 +95,9 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
       title: '操作',
       dataIndex: ColumnEnum.BaseActions,
       key: ColumnEnum.BaseActions,
-      width: 180,
-      render: (_: unknown, record: UserGroupItem) => {
+      width: 90,
+      fixed: 'right',
+      render: (_: unknown, record: ApplicationItem) => {
         return (
           <Split type='button'>
             {baseActions.map(({ code, name }) => (
@@ -106,9 +116,5 @@ export const baseActions = [
   {
     name: '编辑',
     code: ActionCodeEnum.Update,
-  },
-  {
-    name: '添加/移除用户',
-    code: ActionCodeEnum.UpdateUserList,
   },
 ];

@@ -14,7 +14,7 @@ const responseHandler = () => ({
     const errCode = data.code;
     if (errCode) {
       console.log('response data', data.message, tipErr);
-      tipErr && message.error(data.message, 0);
+      tipErr && message.error(data.message);
       throw data.message;
     }
 

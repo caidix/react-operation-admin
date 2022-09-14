@@ -3,9 +3,9 @@ export interface UserGroupItem {
   name: string;
   desc: string;
   code: string;
-  managers?: unknown[];
-  users?: unknown[];
-  systems?: unknown[];
+  managers?: number[];
+  users?: number[];
+  systems?: number[];
   isDelete?: boolean;
   createTime: string;
   updateTime: string;
