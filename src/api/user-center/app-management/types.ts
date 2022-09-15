@@ -42,3 +42,8 @@ export type IApplicationListReq = {
 export type IApplicationListResp = {
   list: ApplicationItem[];
 } & IPagination;
+
+export type IGetApplicationDetailReq = {
+  id?: number;
+  code?: string;
+};

@@ -1,27 +1,26 @@
-import React, { useMemo, useEffect, ChangeEvent, forwardRef, useImperativeHandle } from 'react';
-import { Input, Form } from 'antd';
+import React, { useState, useEffect, ChangeEvent, forwardRef, useImperativeHandle } from 'react';
+import { Input, Form, Select } from 'antd';
 import useForm, { FormHookProps } from '@src/hooks/use-form';
 import { requestExecute } from '@src/utils/request/utils';
 import { PlatformConsts } from '@src/consts';
 import { Pattern } from '@src/utils/validate';
+import { useRequest } from 'ahooks';
+import { getUserOrganizations } from '@src/api/user-center/user-group-management';
 import { ColumnEnum } from '../../config';
 interface IProps {
   data?: any;
+  disabled?: boolean;
 }
+
+const { Option } = Select;
 export interface IApplicationFormProps {
   form: FormHookProps[0];
 }
 const EditApplicationForm = forwardRef<IApplicationFormProps, IProps>((props, ref) => {
-  const { data } = props;
+  const { data, disabled = false } = props;
   const [form, formMethod] = useForm({
-    cols: [6, 18],
+    cols: [5, 18],
   });
-
-  useImperativeHandle(ref, () => ({ form }));
-
-  useEffect(() => {
-    form.setFieldsValue({ ...data });
-  }, [data]);
 
   const handleAppCodeChange = (event: ChangeEvent<HTMLInputElement>) => {
     const code = event.target.value;
@@ -30,8 +29,19 @@ const EditApplicationForm = forwardRef<IApplicationFormProps, IProps>((props, re
     form.setFieldsValue({ [ColumnEnum.Url]: url });
   };
 
+  const { data: organizationList, loading } = useRequest(getUserOrganizations, {
+    cacheKey: 'getUserOrganizations',
+  });
+
+  useImperativeHandle(ref, () => ({ form }));
+
+  useEffect(() => {
+    const res = data || {};
+    form.setFieldsValue({ ...res });
+  }, [data]);
+
   return (
-    <Form form={form} {...formMethod.layout}>
+    <Form form={form} {...formMethod.layout} disabled={disabled}>
       <Form.Item label='应用名称' rules={[{ required: true, message: '请输入应用名称' }]} name={ColumnEnum.Name}>
         <Input maxLength={64} placeholder='请输入应用名称' />
       </Form.Item>
@@ -68,8 +78,18 @@ const EditApplicationForm = forwardRef<IApplicationFormProps, IProps>((props, re
       <Form.Item label='LOGO图片' name={ColumnEnum.LogoUrl}>
         <Input maxLength={32} disabled placeholder='' allowClear />
       </Form.Item>
-      <Form.Item label='所属项目组' name={ColumnEnum.Organization}>
-        <Input maxLength={32} placeholder='请输入组编码' allowClear />
+      <Form.Item
+        label='所属项目组'
+        name={ColumnEnum.Organization}
+        rules={[{ required: true, message: '请选择所属项目组' }]}
+      >
+        <Select loading={loading} showSearch optionFilterProp='label' placeholder='请选择用户组'>
+          {(organizationList || []).map((org) => (
+            <Option key={org.code} value={org.code} label={org.name}>
+              {org.name}
+            </Option>
+          ))}
+        </Select>
       </Form.Item>
       <Form.Item name={ColumnEnum.Description} label='描述' initialValue={''}>
         <Input.TextArea autoSize={false} maxLength={2048} placeholder='请输入用户组描述' showCount />

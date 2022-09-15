@@ -5,29 +5,27 @@ import PageHeader from '@src/layout/PageHeader';
 import useAntdTable from '@src/hooks/use-antd-table';
 import ColumnSetting, { ColumnSettingProps } from '@src/components/ColumnsFilter/Filter';
 import CustomTable from '@src/components/CustomTable';
-import { useSetState } from 'ahooks';
+import { useRequest, useSetState } from 'ahooks';
 import { requestExecute } from '@src/utils/request/utils';
 import { ActionCodeEnum, EMPTY_OPTION, EMPTY_TABLE } from '@src/consts';
 import { ApplicationItem } from '@src/api/user-center/app-management/types';
 import { getApplicationList } from '@src/api/user-center/app-management';
 import { FilterColumnType } from '@src/components/ColumnsFilter';
-import { getOrganizationList } from '@src/api/user-center/user-group-management';
-import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
-import { getColumns } from './config';
+import { getOrganizationList, getUserOrganizations } from '@src/api/user-center/user-group-management';
+
+import { useNavigate } from 'react-router-dom';
+import { RoutePath } from '@src/routes/config';
+import { getColumns, OrganizationListItem } from './config';
 import EditApplicationModal from './components/EditApplicationModal';
 
 const { Option } = Select;
 
 const ApplicationManagement: React.FC = () => {
   const [form] = Form.useForm();
+  const navigate = useNavigate();
   /* 新增弹窗 */
   const [visibleEditModal, setVisibleEditModal] = useState<boolean>(false);
-  const [organizationList, setOrganizationList] = useState<
-    {
-      name: string;
-      code: string;
-    }[]
-  >([]);
+  const [organizationList, setOrganizationList] = useState<OrganizationListItem[]>([]);
 
   const { tableProps, search } = useAntdTable(
     async ({ current, pageSize }, formData: any) => {
@@ -49,14 +47,17 @@ const ApplicationManagement: React.FC = () => {
     },
     { defaultPageSize: 10, form },
   );
+  const { submit, reset, reload } = search;
+
   /** 基础编辑操作 */
   function handleBaseActions(record: ApplicationItem, code: ActionCodeEnum) {
     if (code === ActionCodeEnum.Update) {
-      // return changeModelInfo(record);
+      navigate(`/${RoutePath.USER_APPLICATION_EDIT}?code=${record.code}`, { replace: true });
     }
   }
 
-  const columns = getColumns({ handleBaseActions });
+  const columns = getColumns({ handleBaseActions, organizationList });
+
   const [curColumns, setCurColumns] = useState<FilterColumnType<any>[]>(columns);
   const filterProps: ColumnSettingProps = {
     columns,
@@ -64,20 +65,16 @@ const ApplicationManagement: React.FC = () => {
     callback: setCurColumns,
   };
 
-  const { submit, reset, reload } = search;
-
-  const handleFetchOrganizationList = async () => {
-    const [err, res] = await requestExecute(getOrganizationList, {
-      size: 10000,
-      page: 1,
-    });
-    if (err) return setOrganizationList([EMPTY_OPTION]);
-    setOrganizationList([EMPTY_OPTION, ...res.list]);
-  };
-
-  useEffect(() => {
-    handleFetchOrganizationList();
-  }, []);
+  /** 获取所有用户组 */
+  useRequest(getUserOrganizations, {
+    cacheKey: 'getUserOrganizations',
+    onSuccess: (res) => {
+      setOrganizationList([EMPTY_OPTION, ...res]);
+    },
+    onError: () => {
+      setOrganizationList([EMPTY_OPTION]);
+    },
+  });
 
   const Header = (
     <Form form={form}>
@@ -105,7 +102,7 @@ const ApplicationManagement: React.FC = () => {
             </Select>
           </Form.Item>
         </Col>
-        <Col span={8} className='text-right'>
+        <Col span={8}>
           <Space>
             <Button type='primary' htmlType='submit' onClick={submit}>
               查询

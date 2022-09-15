@@ -2,7 +2,7 @@ import type { TableColumnType } from 'antd';
 import { useCallback, useMemo, useState } from 'react';
 import StorageUtil from '@src/utils/storage';
 import { isNumber, isBoolean } from 'lodash-es';
-import { useRafState, useMount } from 'ahooks';
+import { useRafState, useMount, useAsyncEffect, useUpdateEffect } from 'ahooks';
 
 type Storage = 'localStorage' | 'sessionStorage';
 
@@ -182,6 +182,10 @@ function useContainer<T>(props: UseContainerProps): ContainerProps {
   useMount(() => {
     initColumns();
   });
+
+  useUpdateEffect(() => {
+    initColumns();
+  }, [props.columns]);
 
   const Container = {
     setColumns,

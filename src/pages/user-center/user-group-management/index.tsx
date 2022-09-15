@@ -86,12 +86,12 @@ const UserGroupManagement: React.FC = () => {
     <Form form={form}>
       <Row gutter={24}>
         {/** 角色系统 */}
-        <Col span={16}>
+        <Col span={8}>
           <Form.Item shouldUpdate label='用户组名称' name='name'>
             <Input placeholder='请输入用户组名称' allowClear />
           </Form.Item>
         </Col>
-        <Col span={8} style={{ textAlign: 'right' }}>
+        <Col span={4} >
           <Space>
             <Button type='primary' htmlType='submit' onClick={submit}>
               查询

@@ -5,6 +5,8 @@ import {
   IDeleteApplicationReq,
   IApplicationListResp,
   IApplicationListReq,
+  IGetApplicationDetailReq,
+  ApplicationItem,
 } from './types';
 
 export const postCreateApplication = (data: IApplicationBaseReq) => {
@@ -21,4 +23,8 @@ export const postDeleteApplication = (data: IDeleteApplicationReq) => {
 
 export const getApplicationList = (query: IApplicationListReq) => {
   return http.get<IApplicationListResp>('/system/list', query);
+};
+
+export const getApplicationDetail = (data: IGetApplicationDetailReq) => {
+  return http.post<ApplicationItem>('/system/system-detail', data);
 };

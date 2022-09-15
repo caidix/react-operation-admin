@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Button } from 'antd';
 import Split from '@src/components/Split';
 import { ActionCodeEnum } from '@src/consts';
 import { ApplicationItem } from '@src/api/user-center/app-management/types';
+import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
 export enum ColumnEnum {
   /** 系统名称 */
   Name = 'name',
@@ -30,11 +31,17 @@ export enum ColumnEnum {
   BaseActions = 'baseActions',
 }
 
+export interface OrganizationListItem {
+  name: string;
+  code: string;
+}
+
 interface IColumnProps {
+  organizationList: OrganizationListItem[];
   handleBaseActions(R: ApplicationItem, code: ActionCodeEnum): void;
 }
 
-export const getColumns = ({ handleBaseActions }: IColumnProps) => {
+export const getColumns = ({ handleBaseActions, organizationList }: IColumnProps) => {
   return [
     {
       title: '应用名称',
@@ -70,9 +77,8 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
       key: ColumnEnum.Organization,
       width: 160,
       ellipsis: true,
-      render: (_: unknown, record: ApplicationItem) => {
-        console.log({ _, record });
-        return 1;
+      render: (data: string) => {
+        return organizationList.find(({ code }) => code === data)?.name;
       },
     },
     {

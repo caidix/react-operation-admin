@@ -125,7 +125,7 @@ const CheckboxList = ({
           move(dragKey, dropKey, position);
         }}
         titleRender={(_node) => {
-          return _node.title;
+          return <>{_node.title}</>;
         }}
       />
     )

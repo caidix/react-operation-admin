@@ -38,7 +38,7 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
   };
 
   return (
-    <Modal title='新增应用' visible={visible} width={560} onCancel={onClose} onOk={handleConfirm}>
+    <Modal title='新增应用' visible={visible} width={500} onCancel={onClose} onOk={handleConfirm}>
       <EditApplicationForm ref={formRef} data={data} />
     </Modal>
   );

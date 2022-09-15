@@ -1,5 +1,5 @@
 import http from '@src/utils/request';
-import { IOrganizationListReq, IOrganizationListResp, IOrganizationUsersReq } from './types';
+import { IOrganizationListReq, IOrganizationListResp, IOrganizationUsersReq, UserGroupItem } from './types';
 
 export const getOrganizationList = (params: IOrganizationListReq) => {
   return http.get<IOrganizationListResp>('/organization/list', params);
@@ -15,4 +15,8 @@ export const postUpdateOrganization = (data = {}) => {
 
 export const postOrganizationUsers = (data: IOrganizationUsersReq = {}) => {
   return http.post('/organization/get-organization-users', data);
+};
+
+export const getUserOrganizations = () => {
+  return http.get<UserGroupItem[]>('/organization/get-user-organizations');
 };

@@ -84,6 +84,8 @@ export function renderHover(value: any) {
 
 function getEnumsValue(enums: EnumColumnType = [], _value: any) {
   const match = enums.find(({ value }) => value === _value);
+  console.log({ enums, match });
+
   return (match && match.label) || '';
 }
 
