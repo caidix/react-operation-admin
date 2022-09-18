@@ -12,7 +12,7 @@ import styles from './index.module.less';
 const AppEditManagement = () => {
   const items = [
     { label: '应用信息', key: TabItemEnum.APPLICATION_EDIT, children: <EditApplicationDetail /> }, // 务必填写 key
-    { label: '项目 2', key: 'item-2', children: '内容 2' },
+    { label: '菜单管理', key: TabItemEnum.MENU_EDIT, children: '内容 2' },
   ];
   return (
     <ContainerLayout custom title='应用管理' header={<>当前应用：</>}>

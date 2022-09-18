@@ -1,24 +1,25 @@
 import { Layout, Menu, Spin } from 'antd';
-import React, { FC, useEffect } from 'react';
+import React, { FC, useEffect, useMemo } from 'react';
 import { DesktopOutlined, FileOutlined, PieChartOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 /** React-router v6 版本采用Outlet来替代先前的子组件渲染 */
 import { Outlet } from 'react-router-dom';
 
-import { useStore } from 'react-redux';
+import { useSelector, useStore } from 'react-redux';
 import router from '@src/router';
 
 import { getCookie } from 'typescript-cookie';
-import { store } from '@src/store';
+import { RootState, store } from '@src/store';
 import { RoutePath } from '@src/routes/config';
 import { setLogin, setLogout } from '@src/store/user';
 import { getUserInfo } from '@src/api/user';
+import { PlatformConsts } from '@src/consts';
+import { setCollapsed } from '@src/store/setting';
 import Brand from './components/Brand';
 import Actions from './components/Actions';
 
 import styles from './index.module.less';
 import LayoutMenu from './components/Menu';
-import { PlatformConsts } from '@src/consts';
 
 const { Header, Sider, Content } = Layout;
 
@@ -46,8 +47,7 @@ const items: MenuItem[] = [
 ];
 
 const PageLayout: FC = (props: IProps) => {
-  const { user } = store.getState();
-
+  const { setting, user } = useSelector((state: RootState) => state);
   async function validateUser() {
     const sessionId = getCookie('sessionId');
     if (!user.isLogin) {
@@ -56,7 +56,7 @@ const PageLayout: FC = (props: IProps) => {
         store.dispatch(setLogout({}));
         return false;
       }
-      const res = await getUserInfo();
+      const res = await getUserInfo({});
       console.log({ user }, res);
       await store.dispatch(
         setLogin({
@@ -67,7 +67,17 @@ const PageLayout: FC = (props: IProps) => {
     }
   }
 
+  function handleSettingCollapse(value: boolean) {
+    console.log('执行了', value);
+    store.dispatch(setCollapsed(value));
+  }
+
   // function renderMenus() {}
+
+  const collapsed = useMemo(() => {
+    console.log({ set: setting.collapsed });
+    return setting.collapsed;
+  }, [setting.collapsed]);
 
   useEffect(() => {
     validateUser();
@@ -88,7 +98,13 @@ const PageLayout: FC = (props: IProps) => {
         </div>
       </Header>
       <Layout className={styles.layout_body}>
-        <Sider theme='light' className={styles.sidebar}>
+        <Sider
+          collapsible
+          collapsed={collapsed}
+          onCollapse={handleSettingCollapse}
+          theme='light'
+          className={styles.sidebar}
+        >
           <LayoutMenu />
         </Sider>
         <Content>
