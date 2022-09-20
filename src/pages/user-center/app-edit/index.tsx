@@ -10,8 +10,11 @@ import { TabItemEnum } from './config';
 import EditApplicationDetail from './components/EditApplicationDetail';
 import styles from './index.module.less';
 const AppEditManagement = () => {
+  const {
+    query: { code },
+  } = useRouter();
   const items = [
-    { label: '应用信息', key: TabItemEnum.APPLICATION_EDIT, children: <EditApplicationDetail /> }, // 务必填写 key
+    { label: '应用信息', key: TabItemEnum.APPLICATION_EDIT, children: <EditApplicationDetail code={code} /> }, // 务必填写 key
     { label: '菜单管理', key: TabItemEnum.MENU_EDIT, children: '内容 2' },
   ];
   return (

@@ -9,11 +9,10 @@ import EditApplicationForm, {
 import FooterToolbar from '@src/components/FooterToolbar';
 import { requestExecute } from '@src/utils/request/utils';
 import styles from '../../index.module.less';
-
-const EditApplicationDetail = () => {
-  const {
-    query: { code },
-  } = useRouter();
+interface IProps {
+  code: string | undefined;
+}
+const EditApplicationDetail: React.FC<IProps> = ({ code }) => {
   const [disabled, setdisabled] = useState(true);
   const formRef = useRef<IApplicationFormProps | null>(null);
   const { data, loading, run, runAsync, refresh } = useRequest(getApplicationDetail, {

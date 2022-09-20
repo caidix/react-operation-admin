@@ -1,3 +1,8 @@
+import { MenuShowEnum, MenuTypeEnum } from '@src/consts/menu';
+
+/**
+ * 应用相关接口Type
+ */
 export interface ApplicationBaseItem {
   name: string;
 
@@ -47,3 +52,39 @@ export type IGetApplicationDetailReq = {
   id?: number;
   code?: string;
 };
+
+/**
+ * 菜单相关接口Type
+ */
+export enum IMenuTypeEnum {
+  MENU = 'menu',
+  PAGE = 'page',
+}
+
+export interface MenuItem {
+  name: string;
+
+  code?: string;
+
+  url: string;
+
+  desc: string;
+
+  menuType: MenuTypeEnum;
+
+  sort?: number;
+
+  isShow: MenuShowEnum;
+
+  systemId: number;
+
+  parentId?: number;
+}
+export interface IGetSystemMenuListReq {
+  code: string;
+}
+
+export type ICreateSystemMenuReq = MenuItem;
+export type IUpdateSystemMenuReq = { id: number } & MenuItem;
+export type IDeleteSystemMenuReq = { id: number };
+export type ISystemMenuDetailReq = { id: number };

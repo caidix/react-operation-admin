@@ -1,31 +1,27 @@
 import http from '@src/utils/request';
-import {
-  IApplicationBaseReq,
-  IApplicationBaseResp,
-  IDeleteApplicationReq,
-  IApplicationListResp,
-  IApplicationListReq,
-  IGetApplicationDetailReq,
-  ApplicationItem,
-} from './types';
+import { ICreateSystemMenuReq, IDeleteSystemMenuReq, IGetSystemMenuListReq, IUpdateSystemMenuReq } from './types';
 
 /** 应用菜单相关接口 */
-export const postCreateApplication = (data: IApplicationBaseReq) => {
-  return http.post<IApplicationBaseResp>('/system/create-system', data);
+export const getSystemMenuList = (data: IGetSystemMenuListReq) => {
+  return http.post<any>('/system-menu/list', data);
 };
 
-export const postUpdateApplication = (data: IApplicationBaseReq) => {
-  return http.post<IApplicationBaseResp>('/system/update-system', data);
+/**创建菜单 */
+export const postCreateSystemMenu = (data: ICreateSystemMenuReq) => {
+  return http.post<any>('/system-menu/create', data);
 };
 
-export const postDeleteApplication = (data: IDeleteApplicationReq) => {
-  return http.post<IApplicationBaseResp>('/system/delete-system', data);
+/**更新菜单 */
+export const postUpdateSystemMenu = (data: IUpdateSystemMenuReq) => {
+  return http.post<any>('/system-menu/update', data);
 };
 
-export const getApplicationList = (query: IApplicationListReq) => {
-  return http.get<IApplicationListResp>('/system/list', query);
+/**删除菜单 */
+export const postDeleteSystemMenu = (data: IDeleteSystemMenuReq) => {
+  return http.post<any>('/system-menu/delete', data);
 };
 
-export const getApplicationDetail = (data: IGetApplicationDetailReq) => {
-  return http.post<ApplicationItem>('/system/system-detail', data);
+/**获取菜单详情 */
+export const postSystemMenuDetail = (data: IDeleteSystemMenuReq) => {
+  return http.post<any>('/system-menu/detail', data);
 };

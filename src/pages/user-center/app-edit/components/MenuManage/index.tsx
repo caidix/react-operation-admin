@@ -15,24 +15,35 @@ import { getOrganizationList, getUserOrganizations } from '@src/api/user-center/
 
 import { useNavigate } from 'react-router-dom';
 import { RoutePath } from '@src/routes/config';
+import useLevelExpand from '@src/hooks/use-level-expand';
+
+import { getSystemMenuList } from '@src/api/user-center/app-management/menus';
+import {
+  DataType,
+  EditModelInfo,
+  levelActions,
+  baseActions,
+  getColumns,
+  ActionType,
+  IModelInfo,
+  MAX_LEVEL,
+} from './config';
 
 const { Option } = Select;
-
-const AppMenuManage: React.FC = () => {
+interface IProps {
+  code: string | undefined;
+}
+const AppMenuManage: React.FC<IProps> = ({ code }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   /* 新增弹窗 */
   const [visibleEditModal, setVisibleEditModal] = useState<boolean>(false);
 
   const { tableProps, search } = useAntdTable(
-    async ({ current, pageSize }, formData: any) => {
-      let organization = formData.organization;
-      organization = organization === EMPTY_OPTION.code ? '' : organization;
-      const [err, res] = await requestExecute(getApplicationList, {
-        size: pageSize,
-        page: current,
-        ...formData,
-        organization,
+    async () => {
+      if (!code) return EMPTY_TABLE;
+      const [err, res] = await requestExecute(getSystemMenuList, {
+        code,
       });
       if (err) {
         return EMPTY_TABLE;
@@ -52,19 +63,31 @@ const AppMenuManage: React.FC = () => {
       navigate(`/${RoutePath.USER_APPLICATION_EDIT}?code=${record.code}`, { replace: true });
     }
   }
-
-  const columns = getColumns({ handleBaseActions, organizationList });
+  const [Level, tableExpandProps] = useLevelExpand({
+    maxLevel: MAX_LEVEL,
+    data: tableProps.dataSource,
+    rowKey: 'id',
+  });
+  const columns = getColumns({
+    Level,
+    getLevelActions: () => {},
+    handleLevelActions: () => {},
+    getBaseActions: () => {},
+    handleBaseActions: () => {},
+    getSyncActions: () => {},
+    handleSyncActions: () => {},
+  });
 
   const [curColumns, setCurColumns] = useState<FilterColumnType<any>[]>(columns);
   const filterProps: ColumnSettingProps = {
     columns,
-    columnsState: { privateKey: 'app-manage', storageType: 'localStorage' },
+    columnsState: { privateKey: 'app-menu-edit', storageType: 'localStorage' },
     callback: setCurColumns,
   };
 
   return (
     <div>
-      <CustomTable columns={curColumns} scroll={{ x: 1500 }} {...tableProps} />
+      <CustomTable columns={curColumns} scroll={{ x: 1500 }} {...tableExpandProps} {...tableProps} pagination={false} />
     </div>
   );
 };
