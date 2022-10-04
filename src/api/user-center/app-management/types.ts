@@ -1,4 +1,5 @@
-import { MenuShowEnum, MenuTypeEnum } from '@src/consts/menu';
+import { ActionCodeEnum } from '@src/consts';
+import { MenuFieldEnum, MenuShowEnum, MenuTypeEnum } from '@src/consts/menu';
 
 /**
  * 应用相关接口Type
@@ -76,7 +77,7 @@ export interface MenuItem {
 
   isShow: MenuShowEnum;
 
-  systemId: number;
+  systemCode: string;
 
   parentId?: number;
 }
@@ -84,7 +85,14 @@ export interface IGetSystemMenuListReq {
   code: string;
 }
 
+export type HandleMenuBase = { [MenuFieldEnum.Id]: number; [MenuFieldEnum.SystemCode]: string };
 export type ICreateSystemMenuReq = MenuItem;
-export type IUpdateSystemMenuReq = { id: number } & MenuItem;
-export type IDeleteSystemMenuReq = { id: number };
-export type ISystemMenuDetailReq = { id: number };
+export type IUpdateSystemMenuReq = { [MenuFieldEnum.Id]: number } & MenuItem;
+export type IDeleteSystemMenuReq = HandleMenuBase;
+export type ISystemMenuDetailReq = HandleMenuBase;
+export type IChangeMenuStatusReq = HandleMenuBase & {
+  type: number;
+};
+export type IMoveSystemMenuReq = HandleMenuBase & {
+  type: number;
+};

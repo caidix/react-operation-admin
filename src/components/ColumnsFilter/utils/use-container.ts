@@ -183,9 +183,9 @@ function useContainer<T>(props: UseContainerProps): ContainerProps {
     initColumns();
   });
 
-  useUpdateEffect(() => {
-    initColumns();
-  }, [props.columns]);
+  // useUpdateEffect(() => {
+  //   initColumns();
+  // }, [props.columns]);
 
   const Container = {
     setColumns,

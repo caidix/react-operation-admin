@@ -1,9 +1,16 @@
 import http from '@src/utils/request';
-import { ICreateSystemMenuReq, IDeleteSystemMenuReq, IGetSystemMenuListReq, IUpdateSystemMenuReq } from './types';
+import {
+  IChangeMenuStatusReq,
+  ICreateSystemMenuReq,
+  IDeleteSystemMenuReq,
+  IGetSystemMenuListReq,
+  IMoveSystemMenuReq,
+  IUpdateSystemMenuReq,
+} from './types';
 
 /** 应用菜单相关接口 */
 export const getSystemMenuList = (data: IGetSystemMenuListReq) => {
-  return http.post<any>('/system-menu/list', data);
+  return http.get<any>('/system-menu/list', data);
 };
 
 /**创建菜单 */
@@ -24,4 +31,14 @@ export const postDeleteSystemMenu = (data: IDeleteSystemMenuReq) => {
 /**获取菜单详情 */
 export const postSystemMenuDetail = (data: IDeleteSystemMenuReq) => {
   return http.post<any>('/system-menu/detail', data);
+};
+
+/**菜单排序上下移 */
+export const postMoveSystemMenu = (data: IMoveSystemMenuReq) => {
+  return http.post<any>('/system-menu/move', data);
+};
+
+/**菜单显示隐藏 */
+export const postChangeMenuStatus = (data: IChangeMenuStatusReq) => {
+  return http.post<any>('/system-menu/status', data);
 };

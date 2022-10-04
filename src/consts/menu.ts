@@ -103,11 +103,11 @@ export enum MenuFieldEnum {
   Sort = 'sort',
   IsDelete = 'isDelete',
   ParentId = 'parentId',
-  SystemId = 'systemId',
+  SystemCode = 'systemCode',
 }
 
 export interface MenuBaseData {
-  [MenuFieldEnum.Id]: string;
+  [MenuFieldEnum.Id]: number;
   // 名称
   [MenuFieldEnum.Name]: string;
   // 编码
@@ -133,7 +133,7 @@ export interface MenuBaseData {
   updateTime?: string;
   // 上级菜单id
   [MenuFieldEnum.ParentId]?: number;
-  [MenuFieldEnum.SystemId]: number;
+  [MenuFieldEnum.SystemCode]: string;
   // 是否删除
   [MenuFieldEnum.IsDelete]?: PageStatusEnum;
   // 子菜单

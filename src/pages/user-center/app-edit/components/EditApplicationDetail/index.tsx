@@ -10,7 +10,7 @@ import FooterToolbar from '@src/components/FooterToolbar';
 import { requestExecute } from '@src/utils/request/utils';
 import styles from '../../index.module.less';
 interface IProps {
-  code: string | undefined;
+  code: string;
 }
 const EditApplicationDetail: React.FC<IProps> = ({ code }) => {
   const [disabled, setdisabled] = useState(true);
@@ -57,7 +57,7 @@ const EditApplicationDetail: React.FC<IProps> = ({ code }) => {
     } else {
       message.error('缺少应用相关参数！');
     }
-  }, [code]);
+  }, []);
 
   return (
     <Spin spinning={loading}>

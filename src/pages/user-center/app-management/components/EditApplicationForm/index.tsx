@@ -79,9 +79,9 @@ const EditApplicationForm = forwardRef<IApplicationFormProps, IProps>((props, re
         <Input maxLength={32} disabled placeholder='' allowClear />
       </Form.Item>
       <Form.Item
-        label='所属项目组'
+        label='所属用户组'
         name={ColumnEnum.Organization}
-        rules={[{ required: true, message: '请选择所属项目组' }]}
+        rules={[{ required: true, message: '请选择所属用户组' }]}
       >
         <Select loading={loading} showSearch optionFilterProp='label' placeholder='请选择用户组'>
           {(organizationList || []).map((org) => (

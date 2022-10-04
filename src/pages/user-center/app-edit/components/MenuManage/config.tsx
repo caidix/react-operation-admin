@@ -30,17 +30,10 @@ export enum HandleTypeEnum {
   Hidden = 4,
 }
 
+// 菜单最高层级 - 3层 超过时不可继续新增子菜单
 export const MAX_LEVEL = 3;
 
-export const getColumns = ({
-  Level,
-  getLevelActions,
-  getBaseActions,
-  getSyncActions,
-  handleBaseActions,
-  handleLevelActions,
-  handleSyncActions,
-}: any) => {
+export const getColumns = ({ Level, getLevelActions, getBaseActions, handleBaseActions, handleLevelActions }: any) => {
   return [
     {
       title: (
@@ -112,6 +105,7 @@ export const getColumns = ({
       fixed: 'right',
       width: 330,
       render: (_: unknown, record: DataType) => {
+        console.log({ _, record });
         const actions = getLevelActions(record);
         return (
           <Split type='button'>
@@ -191,15 +185,15 @@ export const baseActions = [
 ] as Array<any>;
 
 /** 弹窗传参 */
-export interface IModelInfo {
+export enum ModalTypeEnum {
+  Edit = 'edit',
+  Create = 'create',
+}
+export interface ModelInfo {
   visible: boolean;
-  code: ActionCodeEnum;
+  type: ModalTypeEnum;
   data: null | DataType;
   parent: null | DataType;
-}
-
-export interface EditModelInfo {
-  code: ActionCodeEnum;
-  data?: null | DataType;
-  parent?: null | DataType;
+  onConfirm?: () => void;
+  onClose?: () => void;
 }

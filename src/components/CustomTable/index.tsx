@@ -153,4 +153,4 @@ function CustomTable<T>(props: TableProps<any>, ref: React.Ref<HTMLDivElement>) 
 
 CustomTable.displayName = 'CustomTable';
 
-export default forwardRef(CustomTable);
+export default React.memo(forwardRef(CustomTable));

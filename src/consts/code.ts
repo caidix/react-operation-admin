@@ -17,4 +17,20 @@ export enum ActionCodeEnum {
   Delete = 'delete',
   /** 更新用户权限 */
   UpdateUserList = 'updateUserList',
+
+  CreateSiblingMenu = 'createSiblingMenu',
+  /** 新增子菜单 */
+  CreateSubMenu = 'createSubMenu',
+  /** 编辑菜单 */
+  UpdateMenu = 'updateMenu',
+  /** 删除菜单 */
+  DeleteMenu = 'deleteMenu',
+  /** 下移 */
+  MoveDown = 'moveDown',
+  /** 上移 */
+  MoveUp = 'moveUp',
+  /** 设置显示 */
+  DisplayMenu = 'displayMenu',
+  /** 设置隐藏 */
+  HideMenu = 'hideMenu',
 }

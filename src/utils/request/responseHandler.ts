@@ -35,23 +35,24 @@ const responseHandler = () => ({
       return Promise.reject(error);
     }
     const data = error.response.data || {};
-    if (error.response.status === 404) {
+    const status = error.response.status;
+    if (status === 404) {
       message.error({
         content: '请求的接口没有找到！请联系开发查看',
       });
-    } else if (error.response.status === 403) {
+    } else if (status === 403) {
       message.error({
         content: 'Forbidden：' + data?.message || '',
       });
       /** 未登录，移除缓存 - 跳转登录页 */
-    } else if (error.response.status === 401) {
+    } else if (status === 401) {
       message.error({
         content: '用户未登录或登录态失效,请重新登录',
       });
       store.dispatch(setLogout({}));
     } else {
       message.error({
-        content: data?.message || '',
+        content: data?.message || error.response.statusText,
       });
     }
     const httpError = new HttpError(data.code || error.response.status, data.message || error.message);

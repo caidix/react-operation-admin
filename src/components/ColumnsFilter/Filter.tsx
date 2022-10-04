@@ -204,8 +204,8 @@ function ColumnSetting<T>(props: ColumnSettingProps<T>) {
   return (
     <Popover
       arrowPointAtCenter
-      visible={visible}
-      onVisibleChange={visibleChange}
+      open={visible}
+      onOpenChange={visibleChange}
       overlayClassName={styles.list_overlay}
       trigger='click'
       placement='bottomRight'

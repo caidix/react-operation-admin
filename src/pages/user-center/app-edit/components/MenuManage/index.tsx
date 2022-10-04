@@ -11,33 +11,65 @@ import { ActionCodeEnum, EMPTY_OPTION, EMPTY_TABLE } from '@src/consts';
 import { ApplicationItem } from '@src/api/user-center/app-management/types';
 import { getApplicationList } from '@src/api/user-center/app-management';
 import { FilterColumnType } from '@src/components/ColumnsFilter';
-import { getOrganizationList, getUserOrganizations } from '@src/api/user-center/user-group-management';
-
 import { useNavigate } from 'react-router-dom';
 import { RoutePath } from '@src/routes/config';
 import useLevelExpand from '@src/hooks/use-level-expand';
 
-import { getSystemMenuList } from '@src/api/user-center/app-management/menus';
+import {
+  getSystemMenuList,
+  postChangeMenuStatus,
+  postDeleteSystemMenu,
+  postMoveSystemMenu,
+} from '@src/api/user-center/app-management/menus';
+import { MenuFieldEnum, MenuShowEnum, MenuTypeEnum } from '@src/consts/menu';
+import MenuEditModal from './components/MenuEditModal';
 import {
   DataType,
-  EditModelInfo,
   levelActions,
   baseActions,
   getColumns,
   ActionType,
-  IModelInfo,
   MAX_LEVEL,
+  ModelInfo,
+  ModalTypeEnum,
 } from './config';
 
 const { Option } = Select;
 interface IProps {
-  code: string | undefined;
+  code: string;
 }
 const AppMenuManage: React.FC<IProps> = ({ code }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
   /* 新增弹窗 */
   const [visibleEditModal, setVisibleEditModal] = useState<boolean>(false);
+
+  const [editModalInfo, setModalInfo] = useSetState<ModelInfo>({
+    visible: false,
+    type: ModalTypeEnum.Create,
+    data: null,
+    parent: null,
+  });
+
+  const closeEditModal = () => setModalInfo({ visible: false });
+
+  const handleModelInfo = ({
+    type,
+    data = null,
+    parent = null,
+  }: {
+    type: ModalTypeEnum;
+    data?: DataType | null;
+    parent?: DataType | null;
+  }) => {
+    const visible = !editModalInfo.visible;
+    setModalInfo({
+      visible: visible,
+      parent,
+      type,
+      data,
+    });
+  };
 
   const { tableProps, search } = useAntdTable(
     async () => {
@@ -49,20 +81,147 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
         return EMPTY_TABLE;
       }
       return {
-        list: res.list,
+        list: formatTrees(res.list),
         total: res.total || 0,
       };
     },
     { defaultPageSize: 10, form },
   );
   const { submit, reset, reload } = search;
+  console.log({ tableProps });
 
-  /** 基础编辑操作 */
-  function handleBaseActions(record: ApplicationItem, code: ActionCodeEnum) {
-    if (code === ActionCodeEnum.Update) {
-      navigate(`/${RoutePath.USER_APPLICATION_EDIT}?code=${record.code}`, { replace: true });
+  /** 格式化树数据 */
+  const formatTrees = (tree: DataType[], parent: DataType | null = null, level = 1) => {
+    const res: DataType[] = [];
+    tree.forEach((item) => {
+      const node: DataType = {
+        ...item,
+        parent,
+        level,
+      };
+      const children =
+        item.children && item.children.length > 0
+          ? formatTrees(item.children as DataType[], node, level + 1)
+          : undefined;
+      res.push({
+        ...node,
+        children,
+      });
+    });
+    return res;
+  };
+
+  /** 层级操作逻辑、请求 */
+  const handleMenuSort = async (code: ActionCodeEnum.MoveDown | ActionCodeEnum.MoveUp, record: DataType) => {
+    const [err] = await requestExecute(postMoveSystemMenu, {
+      type: ActionType[code],
+      [MenuFieldEnum.Id]: record[MenuFieldEnum.Id],
+      [MenuFieldEnum.SystemCode]: record[MenuFieldEnum.SystemCode],
+    });
+    if (err) {
+      message.error(err.message);
+      return;
     }
-  }
+    submit();
+  };
+
+  const getLevelActions = (record: Required<DataType>) => {
+    // 数组长度 - 最高层级3级不可再加
+    let temp = levelActions;
+    if (record.level >= MAX_LEVEL) {
+      temp = temp.filter((action) => action.code !== ActionCodeEnum.CreateSubMenu);
+    }
+    // 上下移动按钮显示
+    const siblings = record.level === 1 ? tableProps.dataSource : record.parent?.children;
+    console.log({ siblings, record, ...tableProps });
+    if (siblings && siblings.length && siblings![siblings!.length - 1].code === record.code) {
+      temp = temp.filter((action) => action.code !== ActionCodeEnum.MoveDown);
+    }
+    if (siblings && siblings.length && siblings![0].code === record.code) {
+      temp = temp.filter((action) => action.code !== ActionCodeEnum.MoveUp);
+    }
+    // 菜单类型为页面无法添加子菜单
+    if (record[MenuFieldEnum.MenuType] === MenuTypeEnum.Page) {
+      temp = temp.filter((action) => action.code !== ActionCodeEnum.CreateSubMenu);
+    }
+    return temp;
+  };
+
+  const handleLevelActions = (code: ActionCodeEnum, record: DataType) => {
+    switch (code) {
+      case ActionCodeEnum.CreateSiblingMenu: {
+        return handleModelInfo({ type: ModalTypeEnum.Create, data: null, parent: record.parent });
+      }
+      // 新增同级菜单时 parentId为其父级， 新增子菜单为其本身
+      case ActionCodeEnum.CreateSubMenu: {
+        return handleModelInfo({ type: ModalTypeEnum.Create, data: null, parent: record });
+      }
+      case ActionCodeEnum.MoveDown:
+      case ActionCodeEnum.MoveUp:
+        return handleMenuSort(code, record);
+      default:
+        throw new Error('未知层级操作编码!');
+    }
+  };
+
+  /** 基础操作逻辑、请求 */
+  const handleChangeStatus = async (code: ActionCodeEnum.DisplayMenu | ActionCodeEnum.HideMenu, record: DataType) => {
+    const [err] = await requestExecute(postChangeMenuStatus, {
+      type: ActionType[code],
+      [MenuFieldEnum.Id]: record[MenuFieldEnum.Id],
+      [MenuFieldEnum.SystemCode]: record[MenuFieldEnum.SystemCode],
+    });
+    if (!err) {
+      submit();
+      return message.success('菜单状态修改成功');
+    }
+  };
+
+  const handleDeleteMenu = (record: DataType) => {
+    Modal.confirm({
+      centered: true,
+      title: `确认删除菜单【${record.name}】吗?`,
+      content: '注意：删除操作会进行该菜单的子级菜单和角色菜单权限的关联删除！',
+      onOk: async () => {
+        const [err] = await requestExecute(postDeleteSystemMenu, {
+          [MenuFieldEnum.Id]: record[MenuFieldEnum.Id],
+          [MenuFieldEnum.SystemCode]: record[MenuFieldEnum.SystemCode],
+        });
+        if (!err) {
+          submit();
+          return message.success('删除菜单成功');
+        }
+      },
+    });
+  };
+
+  const getBaseActions = (record: DataType) => {
+    const { isShow } = record;
+    let temp = baseActions;
+    console.log({ ...tableProps });
+    if (isShow === MenuShowEnum.Hidden) {
+      temp = baseActions.filter((i) => i.code !== ActionCodeEnum.HideMenu);
+    }
+    if (isShow === MenuShowEnum.Show) {
+      temp = baseActions.filter((i) => i.code !== ActionCodeEnum.DisplayMenu);
+    }
+    return temp;
+  };
+
+  const handleBaseActions = (code: ActionCodeEnum, record: DataType) => {
+    switch (code) {
+      case ActionCodeEnum.DisplayMenu:
+      case ActionCodeEnum.HideMenu:
+        return handleChangeStatus(code, record);
+      case ActionCodeEnum.DeleteMenu:
+        return handleDeleteMenu(record);
+      case ActionCodeEnum.UpdateMenu:
+        return handleModelInfo({ code, data: record, parent: record.parent });
+      default:
+        throw new Error('未知动作处理编码!');
+    }
+  };
+
   const [Level, tableExpandProps] = useLevelExpand({
     maxLevel: MAX_LEVEL,
     data: tableProps.dataSource,
@@ -70,24 +229,25 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
   });
   const columns = getColumns({
     Level,
-    getLevelActions: () => {},
-    handleLevelActions: () => {},
-    getBaseActions: () => {},
-    handleBaseActions: () => {},
-    getSyncActions: () => {},
-    handleSyncActions: () => {},
+    getLevelActions,
+    handleLevelActions,
+    getBaseActions,
+    handleBaseActions,
   });
-
-  const [curColumns, setCurColumns] = useState<FilterColumnType<any>[]>(columns);
-  const filterProps: ColumnSettingProps = {
-    columns,
-    columnsState: { privateKey: 'app-menu-edit', storageType: 'localStorage' },
-    callback: setCurColumns,
-  };
 
   return (
     <div>
-      <CustomTable columns={curColumns} scroll={{ x: 1500 }} {...tableExpandProps} {...tableProps} pagination={false} />
+      <PageHeader
+        rightCtn={
+          <>
+            <Button onClick={() => handleModelInfo({ type: ModalTypeEnum.Create })} className='mr-2' type='primary'>
+              新增
+            </Button>
+          </>
+        }
+      />
+      <CustomTable columns={columns} scroll={{ x: 1500 }} {...tableExpandProps} {...tableProps} pagination={false} />
+      <MenuEditModal {...editModalInfo} code={code} onConfirm={closeEditModal} onClose={closeEditModal} />
     </div>
   );
 };
