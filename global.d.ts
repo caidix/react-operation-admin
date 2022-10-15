@@ -28,7 +28,6 @@ declare interface IPagination {
   total?: number;
 }
 
-
 declare interface IDateParam {
   createTime?: string;
   updateTime?: string;
@@ -40,3 +39,19 @@ declare global {
     target: HTMLInputElement;
   }
 }
+
+declare type PickByObject<T extends Record<any, any>, K> = {
+  [U in keyof T as U extends K ? U : never]: T[U];
+};
+
+declare type Copy<T> = Pick<T, keyof T>;
+
+declare type PartialByKeys<T extends Record<any, any>, K extends keyof T> = K extends never
+  ? {
+      [k in keyof T]?: T[k];
+    }
+  : {
+      [V in keyof T as V extends K ? V : never]?: T[V];
+    } & {
+      [V in keyof T as V extends K ? never : V]: T[V];
+    };

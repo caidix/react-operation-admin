@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Button, Col, Form, Input, message, Modal, Row, Select, Space, Table } from 'antd';
-import ContainerLayout from '@src/layout/ContentLayout';
 import PageHeader from '@src/layout/PageHeader';
 import useAntdTable from '@src/hooks/use-antd-table';
-import ColumnSetting, { ColumnSettingProps } from '@src/components/ColumnsFilter/Filter';
 import CustomTable from '@src/components/CustomTable';
-import { useRequest, useSetState } from 'ahooks';
+import { useSetState, useUpdateEffect } from 'ahooks';
 import { requestExecute } from '@src/utils/request/utils';
 import { ActionCodeEnum, EMPTY_OPTION, EMPTY_TABLE } from '@src/consts';
-import { ApplicationItem } from '@src/api/user-center/app-management/types';
-import { getApplicationList } from '@src/api/user-center/app-management';
-import { FilterColumnType } from '@src/components/ColumnsFilter';
 import { useNavigate } from 'react-router-dom';
-import { RoutePath } from '@src/routes/config';
 import useLevelExpand from '@src/hooks/use-level-expand';
 
 import {
@@ -21,7 +15,8 @@ import {
   postDeleteSystemMenu,
   postMoveSystemMenu,
 } from '@src/api/user-center/app-management/menus';
-import { MenuFieldEnum, MenuShowEnum, MenuTypeEnum } from '@src/consts/menu';
+import { MenuFieldEnum, MenuShowEnum, MenuTypeEnum } from '@src/api/user-center/app-management/menus/types';
+import { TabItemEnum } from '../../config';
 import MenuEditModal from './components/MenuEditModal';
 import {
   DataType,
@@ -35,14 +30,13 @@ import {
 } from './config';
 
 const { Option } = Select;
+
 interface IProps {
   code: string;
 }
 const AppMenuManage: React.FC<IProps> = ({ code }) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  /* 新增弹窗 */
-  const [visibleEditModal, setVisibleEditModal] = useState<boolean>(false);
 
   const [editModalInfo, setModalInfo] = useSetState<ModelInfo>({
     visible: false,
@@ -87,7 +81,7 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
     },
     { defaultPageSize: 10, form },
   );
-  const { submit, reset, reload } = search;
+  const { submit, reload } = search;
   console.log({ tableProps });
 
   /** 格式化树数据 */
@@ -216,7 +210,7 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
       case ActionCodeEnum.DeleteMenu:
         return handleDeleteMenu(record);
       case ActionCodeEnum.UpdateMenu:
-        return handleModelInfo({ code, data: record, parent: record.parent });
+        return handleModelInfo({ type: ModalTypeEnum.Edit, data: record, parent: record.parent });
       default:
         throw new Error('未知动作处理编码!');
     }
@@ -247,7 +241,7 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
         }
       />
       <CustomTable columns={columns} scroll={{ x: 1500 }} {...tableExpandProps} {...tableProps} pagination={false} />
-      <MenuEditModal {...editModalInfo} code={code} onConfirm={closeEditModal} onClose={closeEditModal} />
+      <MenuEditModal {...editModalInfo} code={code} onConfirm={reload} onClose={closeEditModal} />
     </div>
   );
 };

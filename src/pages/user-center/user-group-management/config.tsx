@@ -3,6 +3,7 @@ import { Button } from 'antd';
 import Split from '@src/components/Split';
 import { ActionCodeEnum } from '@src/consts';
 import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
+import { CommonFieldEnum } from '@src/api/types';
 export enum SupportGroupEnum {
   Default = 1,
   Support = 2,
@@ -24,10 +25,6 @@ export enum ColumnEnum {
   Systems = 'systems',
   /** logo */
   IsDelete = 'isDelete',
-  /** 创建时间 */
-  CreateTime = 'createTime',
-  /** 更新时间 */
-  UpdateTime = 'updateTime',
   /** 基础操作 */
   BaseActions = 'baseActions',
 }
@@ -68,16 +65,16 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
     },
     {
       title: '创建时间',
-      dataIndex: ColumnEnum.CreateTime,
-      key: ColumnEnum.CreateTime,
+      dataIndex: CommonFieldEnum.CreateTime,
+      key: CommonFieldEnum.CreateTime,
       width: 170,
       ellipsis: true,
       show: false,
     },
     {
       title: '更新时间',
-      dataIndex: ColumnEnum.UpdateTime,
-      key: ColumnEnum.UpdateTime,
+      dataIndex: CommonFieldEnum.UpdateTime,
+      key: CommonFieldEnum.UpdateTime,
       width: 170,
       ellipsis: true,
       show: true,

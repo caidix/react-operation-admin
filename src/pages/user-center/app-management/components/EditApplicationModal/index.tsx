@@ -1,9 +1,8 @@
 import React, { useMemo, useEffect, ChangeEvent, useRef, Ref } from 'react';
 import { Modal, message } from 'antd';
 import { requestExecute } from '@src/utils/request/utils';
-import { postCreateOrganization, postUpdateOrganization } from '@src/api/user-center/user-group-management';
 
-import { postCreateApplication } from '@src/api/user-center/app-management';
+import { postCreateApplication } from '@src/api/user-center/app-management/application';
 import EditApplicationForm, { IApplicationFormProps } from '../EditApplicationForm';
 
 interface IProps {
@@ -32,6 +31,7 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
       }
       message.success('新增应用成功');
       onConfirm?.();
+      onClose?.();
     } catch (error) {
       return;
     }

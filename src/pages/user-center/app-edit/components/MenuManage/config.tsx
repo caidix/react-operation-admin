@@ -3,13 +3,8 @@ import {
   MenuShowEnums,
   PageOpenEnums,
   MenuBaseData,
-  MenuShowEnum,
-  MenuTypeEnum,
   MenuTypeTableEnums,
-  PageOpenEnum,
-  PageSourceEnums,
-  PageSourceEnum,
-} from '@src/consts/menu';
+} from '@src/api/user-center/app-management/menus/types';
 import type { ColumnsType as TableColumnsType } from 'antd/lib/table';
 import { Button } from 'antd';
 import Split from '@src/components/Split';

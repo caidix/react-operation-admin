@@ -29,7 +29,7 @@ export const routes: IRouteConfig[] = [
       { path: RoutePath.HOME_PAGE, element: <HomePage /> },
       { path: RoutePath.USER_GROUP_MANAGEMENT, element: <UserGroupManagement />, meta: { name: '用户组管理' } },
       { path: RoutePath.USER_APPLICATION_MANAGEMENT, element: <UserAppManagement />, meta: { name: '应用管理' } },
-      { path: RoutePath.USER_APPLICATION_EDIT, element: <UserAppEdit />, meta: { name: '应用编辑' } },
+      { path: RoutePath.USER_ApplicationEdit, element: <UserAppEdit />, meta: { name: '应用编辑' } },
     ],
   },
   { path: RoutePath.LOGIN, meta: { auth: false, name: '登录' }, element: <Login /> },

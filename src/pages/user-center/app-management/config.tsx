@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { Button } from 'antd';
 import Split from '@src/components/Split';
 import { ActionCodeEnum } from '@src/consts';
-import { ApplicationItem } from '@src/api/user-center/app-management/types';
+import { ApplicationItem } from '@src/api/types';
 import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
 export enum ColumnEnum {
   /** 系统名称 */

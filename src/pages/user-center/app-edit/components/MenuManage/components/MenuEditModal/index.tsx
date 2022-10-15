@@ -11,7 +11,7 @@ import {
   MenuTypeEnums,
   PageOpenEnum,
   PageOpenEnums,
-} from '@src/consts/menu';
+} from '@src/api/user-center/app-management/menus/types';
 import { Pattern } from '@src/utils/validate';
 import { postCreateSystemMenu, postUpdateSystemMenu } from '@src/api/user-center/app-management/menus';
 import { DataType, ModelInfo } from '../../config';
@@ -53,6 +53,7 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
       if (err) return;
       message.success(isEdit ? '编辑菜单成功' : '新增菜单成功');
       props.onConfirm?.();
+      props.onClose?.();
     } catch (error) {
       return;
     } finally {

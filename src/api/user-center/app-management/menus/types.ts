@@ -1,3 +1,7 @@
+/**
+ * 菜单相关接口Type
+ */
+
 /** 页面打开方式 */
 export enum PageOpenEnum {
   Inline = 1,
@@ -147,3 +151,43 @@ export enum ExpandLevel {
 }
 
 export const ExpandLevelEnum = [ExpandLevel.FIRST, ExpandLevel.SECOND, ExpandLevel.THIRD];
+
+export enum IMenuTypeEnum {
+  MENU = 'menu',
+  PAGE = 'page',
+}
+
+export interface MenuItem {
+  name: string;
+
+  code?: string;
+
+  url: string;
+
+  desc: string;
+
+  menuType: MenuTypeEnum;
+
+  sort?: number;
+
+  isShow: MenuShowEnum;
+
+  systemCode: string;
+
+  parentId?: number;
+}
+export interface IGetSystemMenuListReq {
+  code: string;
+}
+
+export type HandleMenuBase = { [MenuFieldEnum.Id]: number; [MenuFieldEnum.SystemCode]: string };
+export type ICreateSystemMenuReq = MenuItem;
+export type IUpdateSystemMenuReq = { [MenuFieldEnum.Id]: number } & MenuItem;
+export type IDeleteSystemMenuReq = HandleMenuBase;
+export type ISystemMenuDetailReq = HandleMenuBase;
+export type IChangeMenuStatusReq = HandleMenuBase & {
+  type: number;
+};
+export type IMoveSystemMenuReq = HandleMenuBase & {
+  type: number;
+};

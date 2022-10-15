@@ -8,10 +8,10 @@ import CustomTable from '@src/components/CustomTable';
 import { useRequest, useSetState } from 'ahooks';
 import { requestExecute } from '@src/utils/request/utils';
 import { ActionCodeEnum, EMPTY_OPTION, EMPTY_TABLE } from '@src/consts';
-import { ApplicationItem } from '@src/api/user-center/app-management/types';
-import { getApplicationList } from '@src/api/user-center/app-management';
+import { ApplicationItem } from '@src/api/user-center/app-management/application/types';
+import { getApplicationList } from '@src/api/user-center/app-management/application';
 import { FilterColumnType } from '@src/components/ColumnsFilter';
-import { getOrganizationList, getUserOrganizations } from '@src/api/user-center/user-group-management';
+import { getUserOrganizations } from '@src/api/user-center/user-group-management';
 
 import { useNavigate } from 'react-router-dom';
 import { RoutePath } from '@src/routes/config';
@@ -52,7 +52,7 @@ const ApplicationManagement: React.FC = () => {
   /** 基础编辑操作 */
   function handleBaseActions(record: ApplicationItem, code: ActionCodeEnum) {
     if (code === ActionCodeEnum.Update) {
-      navigate(`/${RoutePath.USER_APPLICATION_EDIT}?code=${record.code}`, { replace: true });
+      navigate(`/${RoutePath.USER_ApplicationEdit}?code=${record.code}`, { replace: true });
     }
   }
 
@@ -126,14 +126,7 @@ const ApplicationManagement: React.FC = () => {
           </>
         }
       />
-      <EditApplicationModal
-        visible={visibleEditModal}
-        onConfirm={() => {
-          setVisibleEditModal(false);
-          reload();
-        }}
-        onClose={() => setVisibleEditModal(false)}
-      />
+      <EditApplicationModal visible={visibleEditModal} onConfirm={reload} onClose={() => setVisibleEditModal(false)} />
       <CustomTable columns={curColumns} scroll={{ x: 1500 }} {...tableProps} />
     </ContainerLayout>
   );

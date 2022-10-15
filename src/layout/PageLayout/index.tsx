@@ -107,7 +107,7 @@ const PageLayout: FC = (props: IProps) => {
         >
           <LayoutMenu />
         </Sider>
-        <Content>
+        <Content className={styles.content}>
           <div id={PlatformConsts.MAIN_CONTENT_MOUNTED_ID}>
             <Outlet />
           </div>

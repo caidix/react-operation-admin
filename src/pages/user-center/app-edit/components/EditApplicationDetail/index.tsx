@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Col, Spin, Input, message } from 'antd';
-import useRouter from '@src/hooks/use-router';
 import { useBoolean, useRequest } from 'ahooks';
-import { getApplicationDetail, postUpdateApplication } from '@src/api/user-center/app-management';
+import { postUpdateApplication } from '@src/api/user-center/app-management/application';
 import EditApplicationForm, {
   IApplicationFormProps,
 } from '@src/pages/user-center/app-management/components/EditApplicationForm';
@@ -10,17 +9,14 @@ import FooterToolbar from '@src/components/FooterToolbar';
 import { requestExecute } from '@src/utils/request/utils';
 import styles from '../../index.module.less';
 interface IProps {
+  data: any;
   code: string;
+  isFetchEnd: boolean;
+  refresh: () => void;
 }
-const EditApplicationDetail: React.FC<IProps> = ({ code }) => {
-  const [disabled, setdisabled] = useState(true);
+const EditApplicationDetail: React.FC<IProps> = ({ code, data, refresh, isFetchEnd }) => {
   const formRef = useRef<IApplicationFormProps | null>(null);
-  const { data, loading, run, runAsync, refresh } = useRequest(getApplicationDetail, {
-    manual: true,
-    onSuccess: () => {
-      setdisabled(false);
-    },
-  });
+
   const [isLoading, loadingFn] = useBoolean();
 
   const handleSubmit = async () => {
@@ -51,18 +47,10 @@ const EditApplicationDetail: React.FC<IProps> = ({ code }) => {
     }
   };
 
-  useEffect(() => {
-    if (code) {
-      run({ code });
-    } else {
-      message.error('缺少应用相关参数！');
-    }
-  }, []);
-
   return (
-    <Spin spinning={loading}>
+    <Spin spinning={isLoading}>
       <div className={styles['app-edit-form']}>
-        <EditApplicationForm ref={formRef} disabled={disabled} data={data} />
+        <EditApplicationForm ref={formRef} disabled={!isFetchEnd} data={data} />
 
         <FooterToolbar>
           <Button onClick={handleReset}>重置</Button>
