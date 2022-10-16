@@ -53,7 +53,7 @@ const EditAuthorityDialog: FC<EditAuthMenuProps> = (props) => {
 
   useEffect(() => {
     if (visible) {
-      form.setFieldsValue(data);
+      isEdit ? form.setFieldsValue(data) : form.resetFields();
     }
   }, [visible]);
 

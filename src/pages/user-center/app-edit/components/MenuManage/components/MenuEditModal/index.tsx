@@ -26,13 +26,14 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
   const [form, { isLoading, layout, loaded, loading }] = useForm({
     cols: [6, 18],
   });
-  useEffect(() => {
-    if (!visible) return;
-    form.resetFields();
-  }, [visible]);
 
   const isEdit = useMemo(() => type === 'edit', [type]);
   const IRequest = useMemo(() => (isEdit ? postUpdateSystemMenu : postCreateSystemMenu), [isEdit]);
+
+  useEffect(() => {
+    if (!visible) return;
+    isEdit ? form.setFieldsValue(data) : form.resetFields();
+  }, [visible, isEdit]);
 
   const handleConfirm = async () => {
     try {
@@ -79,7 +80,7 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
           <Input allowClear maxLength={64} placeholder='请输入菜单名称，限制最大64个字符' />
         </Form.Item>
         <Form.Item label='菜单编码' name={MenuFieldEnum.Code} rules={[{ required: true, message: '请输入菜单编码' }]}>
-          <Input allowClear maxLength={64} placeholder='请输入菜单名称，限制最大64个字符' />
+          <Input allowClear maxLength={64} disabled={isEdit} placeholder='请输入菜单名称，限制最大64个字符' />
         </Form.Item>
         <Form.Item
           label='菜单类型'

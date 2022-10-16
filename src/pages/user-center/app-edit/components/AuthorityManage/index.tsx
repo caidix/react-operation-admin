@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Input, Tree, message, Button, Typography, Space, Tabs, Spin, Alert, TreeNodeProps } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
+import { Input, Tree, message, Button, Typography, Space, Tabs, Spin, Alert, TreeNodeProps, Table } from 'antd';
 
 import { MenuTypeEnum } from '@src/api/user-center/app-management/menus/types';
 import { useRequest, useSetState } from 'ahooks';
@@ -15,6 +15,9 @@ import { requestExecute } from '@src/utils/request/utils';
 import { EditAuthMenuInfo, TreeData, TreeInfo } from './types';
 import styles from './index.module.less';
 import EditAuthorityDialog from './EditAuthorityDialog';
+import { ColumnSettingProps, FilterColumnType } from '@src/components/ColumnsFilter';
+import PageHeader from '@src/layout/PageHeader';
+import ColumnSetting from '@src/components/ColumnsFilter/Filter';
 
 const { Title } = Typography;
 interface IProps {
@@ -137,6 +140,8 @@ const AuthorityManage: React.FC<IProps> = ({ code }) => {
 
   async function handleDeleteAuthMenu(data: AuthMenuItem) {
     const menuCode = treeInfo.selected.code;
+    console.log({ treeInfo, menuCode, code, data });
+
     if (!menuCode || !code) return;
     const [err] = await requestExecute(postDeleteAuthMenu, {
       code: data[AuthMenuFieldEnum.Code],
@@ -153,11 +158,13 @@ const AuthorityManage: React.FC<IProps> = ({ code }) => {
     {
       title: '功能点名称',
       dataIndex: AuthMenuFieldEnum.Name,
+      key: AuthMenuFieldEnum.Name,
       width: 150,
     },
     {
       title: '功能点编码',
       dataIndex: AuthMenuFieldEnum.Code,
+      key: AuthMenuFieldEnum.Code,
       width: 150,
     },
     {
@@ -165,10 +172,12 @@ const AuthorityManage: React.FC<IProps> = ({ code }) => {
       ellipsis: true,
       width: 150,
       dataIndex: AuthMenuFieldEnum.Description,
+      key: AuthMenuFieldEnum.Description,
     },
     {
       title: '创建时间',
       dataIndex: CommonFieldEnum.CreateTime,
+      key: CommonFieldEnum.CreateTime,
       width: 200,
     },
     {
@@ -180,6 +189,7 @@ const AuthorityManage: React.FC<IProps> = ({ code }) => {
     {
       title: '操作',
       width: 150,
+      key: AuthMenuFieldEnum.Action,
       fixed: 'right',
       render: (record: AuthMenuItem) => {
         return (
@@ -195,6 +205,15 @@ const AuthorityManage: React.FC<IProps> = ({ code }) => {
       },
     },
   ];
+  // const curColumns = useRef(columns);
+  // // const [curColumns, setCurColumns] = useState<FilterColumnType<any>[]>(columns);
+  // const filterProps: ColumnSettingProps = {
+  //   columns,
+  //   columnsState: { privateKey: 'authority-system-manage', storageType: 'localStorage' },
+  //   callback: (columns) => {
+  //     curColumns.current = columns;
+  //   },
+  // };
 
   return (
     <div>
@@ -225,9 +244,13 @@ const AuthorityManage: React.FC<IProps> = ({ code }) => {
         </div>
         <div className={styles['content-flex-right']}>
           {/* <Spin spinning={isLoading}> */}
-          <Title level={5}>当前选中菜单: {treeInfo.selected.name || ''}</Title>
+          <PageHeader
+            text={<Title level={5}>当前选中菜单: {treeInfo.selected.name || ''}</Title>}
+            // rightCtn={<ColumnSetting {...filterProps} />}
+          />
           <CustomTable
             columns={columns}
+            rowKey={AuthMenuFieldEnum.Id}
             loading={isLoading}
             scroll={{ x: 950 }}
             dataSource={authMenuList}

@@ -185,6 +185,7 @@ function useContainer<T>(props: UseContainerProps): ContainerProps {
 
   // useUpdateEffect(() => {
   //   initColumns();
+  //   console.log('zhixing');
   // }, [props.columns]);
 
   const Container = {
