@@ -5,6 +5,8 @@ export enum ActionCodeEnum {
   CreateApp = 'createApp',
   /** 编辑应用 */
   UpdateApp = 'updateApp',
+  /** 编辑权限 */
+  UpdateAuth = 'updateAuth',
   /** 导入应用配置**/
   ImportApp = 'importApp',
   /** 导出应用配置**/

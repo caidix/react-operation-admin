@@ -84,6 +84,7 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
       dataIndex: ColumnEnum.BaseActions,
       key: ColumnEnum.BaseActions,
       width: 180,
+      fixed: 'right',
       render: (_: unknown, record: UserGroupItem) => {
         return (
           <Split type='button'>
@@ -107,5 +108,9 @@ export const baseActions = [
   {
     name: '添加/移除用户',
     code: ActionCodeEnum.UpdateUserList,
+  },
+  {
+    name: '编辑权限',
+    code: ActionCodeEnum.UpdateApp,
   },
 ];

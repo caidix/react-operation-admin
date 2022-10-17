@@ -7,6 +7,7 @@ export class RoutePath {
   static readonly USER_GROUP_MANAGEMENT = `${this.BASE_PREFIX}/user-group-management`;
   static readonly USER_APPLICATION_MANAGEMENT = `${this.BASE_PREFIX}/app-management`;
   static readonly USER_ApplicationEdit = `${this.BASE_PREFIX}/app-edit`;
+  static readonly USER_AUTH_MANAGEMENT = `${this.BASE_PREFIX}/app-auth-management`;
 
   static ROOT_WHITE_PATH = [RoutePath.LOGIN];
 }

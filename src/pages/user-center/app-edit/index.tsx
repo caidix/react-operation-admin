@@ -65,6 +65,15 @@ const AppEditManagement = () => {
         </div>
       ),
     },
+    {
+      label: '接口管理',
+      key: TabItemEnum.InterfaceEdit,
+      children: (
+        <div className={styles.container}>
+          <AuthorityManage code={code} />
+        </div>
+      ),
+    },
   ];
   return (
     <ContainerLayout custom title='应用管理' header={<>当前应用：{data?.name}</>}>
