@@ -21,12 +21,15 @@ const Split: FC<IProps> = (props) => {
   const cls = type === 'button' ? { ...style, ...btnCls } : style;
   const lastIndex = React.Children.count(children) - 1;
   const elements = React.Children.map(children, (child: any, index: number) => {
+    if (!child) {
+      return null;
+    }
     const item = React.cloneElement(child, { style: cls });
-    const splitElement = index === lastIndex ? null : <span className={styles.split}>{split}</span>;
+    const splitElement = index === 0 ? null : <span className={styles.split}>{split}</span>;
     return (
       <>
-        {item}
         {splitElement}
+        {item}
       </>
     );
   });

@@ -23,6 +23,9 @@ export interface UserInfo {
   status: number;
   crateTime: string;
   updateTime: string;
+  managerCodes?: string[];
+  organizationCodes?: string[];
+  roles: string[];
 }
 
 const initialState = {

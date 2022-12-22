@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'antd';
+import { Button, Space } from 'antd';
 import Split from '@src/components/Split';
 import { ActionCodeEnum } from '@src/consts';
 import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
@@ -31,9 +31,10 @@ export enum ColumnEnum {
 
 interface IColumnProps {
   handleBaseActions(R: UserGroupItem, code: ActionCodeEnum): void;
+  isManager: (code: string) => boolean;
 }
 
-export const getColumns = ({ handleBaseActions }: IColumnProps) => {
+export const getColumns = ({ handleBaseActions, isManager }: IColumnProps) => {
   return [
     {
       title: 'ID',
@@ -86,6 +87,8 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
       width: 180,
       fixed: 'right',
       render: (_: unknown, record: UserGroupItem) => {
+        console.log({ isManager: isManager(record.code) });
+
         return (
           <Split type='button'>
             {baseActions.map(({ code, name }) => (
@@ -93,6 +96,12 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
                 {name}
               </Button>
             ))}
+            {isManager(record.code) &&
+              baseManagerActions.map(({ code, name }) => (
+                <Button onClick={() => handleBaseActions(record, code)} type='link' size='small' key={code}>
+                  {name}
+                </Button>
+              ))}
           </Split>
         );
       },
@@ -101,6 +110,13 @@ export const getColumns = ({ handleBaseActions }: IColumnProps) => {
 };
 
 export const baseActions = [
+  {
+    name: '查看',
+    code: ActionCodeEnum.View,
+  },
+];
+
+export const baseManagerActions = [
   {
     name: '编辑',
     code: ActionCodeEnum.Update,

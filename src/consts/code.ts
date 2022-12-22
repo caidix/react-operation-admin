@@ -13,6 +13,8 @@ export enum ActionCodeEnum {
   ExportApp = 'exportApp',
   /** 设置应用管理员**/
   SetAppAdmin = 'setAppAdmin',
+  /** 查看 */
+  View = 'view',
   /** 编辑 */
   Update = 'update',
   /** 删除 */
