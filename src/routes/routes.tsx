@@ -9,14 +9,16 @@ import UserAppEdit from '@src/pages/user-center/app-edit';
 import AuthManagement from '@src/pages/user-center/auth-management';
 import { RoutePath } from './config';
 import Auth from './util';
-export interface IRouteConfig extends RouteObject {
+
+export type IRouteConfig = RouteObject & {
+  element: JSX.Element;
   meta?: {
     icon?: string | React.ReactNode;
     name?: string | React.ReactNode;
     auth?: boolean;
   };
   children?: IRouteConfig[];
-}
+};
 
 export const routes: IRouteConfig[] = [
   {

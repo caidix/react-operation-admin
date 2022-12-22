@@ -4,6 +4,7 @@ import Split from '@src/components/Split';
 import { ActionCodeEnum } from '@src/consts';
 import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
 import { CommonFieldEnum } from '@src/api/types';
+import type { ProColumns } from '@ant-design/pro-components';
 export enum SupportGroupEnum {
   Default = 1,
   Support = 2,
@@ -34,61 +35,51 @@ interface IColumnProps {
   isManager: (code: string) => boolean;
 }
 
-export const getColumns = ({ handleBaseActions, isManager }: IColumnProps) => {
+export const getColumns = ({ handleBaseActions, isManager }: IColumnProps): ProColumns<UserGroupItem>[] => {
   return [
     {
       title: 'ID',
       dataIndex: ColumnEnum.Id,
-      key: ColumnEnum.Id,
       width: 100,
-      ellipsis: true,
+      hideInSearch: true,
     },
     {
-      title: '名称',
+      title: '用户组名称',
       dataIndex: ColumnEnum.Name,
-      key: ColumnEnum.Name,
       width: 160,
       ellipsis: true,
     },
     {
       title: '描述',
       dataIndex: ColumnEnum.Description,
-      key: ColumnEnum.Description,
+      hideInSearch: true,
       width: 160,
       ellipsis: true,
     },
     {
       title: '编码',
       dataIndex: ColumnEnum.Code,
-      key: ColumnEnum.Code,
       width: 160,
-      ellipsis: true,
     },
     {
       title: '创建时间',
       dataIndex: CommonFieldEnum.CreateTime,
-      key: CommonFieldEnum.CreateTime,
+      hideInSearch: true,
       width: 170,
-      ellipsis: true,
-      show: false,
     },
     {
       title: '更新时间',
       dataIndex: CommonFieldEnum.UpdateTime,
-      key: CommonFieldEnum.UpdateTime,
+      hideInSearch: true,
       width: 170,
-      ellipsis: true,
-      show: true,
     },
     {
       title: '操作',
       dataIndex: ColumnEnum.BaseActions,
-      key: ColumnEnum.BaseActions,
+      valueType: 'option',
       width: 180,
       fixed: 'right',
       render: (_: unknown, record: UserGroupItem) => {
-        console.log({ isManager: isManager(record.code) });
-
         return (
           <Split type='button'>
             {baseActions.map(({ code, name }) => (

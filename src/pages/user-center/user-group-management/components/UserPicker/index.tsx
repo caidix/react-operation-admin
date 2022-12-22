@@ -9,7 +9,7 @@ import { UserGroupItem, UserItem } from '@src/api/user-center/user-group-managem
 interface IProps {
   visible: boolean;
   onClose?: () => void;
-  data?: UserGroupItem;
+  data: UserGroupItem | null;
 }
 
 const UserPicker: React.FC<IProps> = (props) => {

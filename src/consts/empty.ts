@@ -1,6 +1,7 @@
 export const EMPTY_TABLE = {
   list: [],
   total: 0,
+  success: false,
 };
 
 export const EMPTY_SORT = '-111';
