@@ -7,6 +7,7 @@ import {
   IApplicationListReq,
   IGetApplicationDetailReq,
   ApplicationItem,
+  IGetAllApplicationListResp,
 } from './types';
 
 /** 应用相关接口 */
@@ -28,4 +29,8 @@ export const getApplicationList = (query: IApplicationListReq) => {
 
 export const getApplicationDetail = (data: IGetApplicationDetailReq) => {
   return http.post<ApplicationItem>('/system/system-detail', data);
+};
+
+export const getAllApplicationList = () => {
+  return http.get<IGetAllApplicationListResp>('/system/all-list');
 };

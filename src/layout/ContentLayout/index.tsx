@@ -51,7 +51,7 @@ const ContainerLayout: FC<IProps> = (props) => {
   );
   return (
     <div className={cls} style={style}>
-      {header && Header}
+      {Header}
       {custom ? children : <div className={styles.content_wrapper}>{children}</div>}
     </div>
   );

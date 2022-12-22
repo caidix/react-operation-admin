@@ -12,6 +12,7 @@ import useUserInfo from '@src/hooks/use-user-info';
 import EditGroupModal from './components/EditGroupModal';
 import { getColumns } from './config';
 import UserPicker from './components/UserPicker';
+import { useNavigate } from 'react-router-dom';
 
 interface AppModelInfo {
   visible: boolean;
@@ -64,11 +65,14 @@ const UserGroupManagement: React.FC = () => {
   const reload = () => {
     actionRef?.current?.reload();
   };
-
+  const navigate = useNavigate();
   /** 基础编辑操作 */
   const handleBaseActions = (record: UserGroupItem, code: ActionCodeEnum) => {
     if (code === ActionCodeEnum.Update) {
       return changeModelInfo(record);
+    }
+    if (code === ActionCodeEnum.UpdateApp) {
+      return navigate('/user/app-auth-management', { state: record });
     }
     changeUserInfo(record);
   };
@@ -121,7 +125,13 @@ const UserGroupManagement: React.FC = () => {
         dateFormatter='string'
         headerTitle='高级表格'
         toolBarRender={() => [
-          <Button className='mr-2' type='primary'>
+          <Button
+            onClick={() => {
+              changeModelInfo();
+            }}
+            className='mr-2'
+            type='primary'
+          >
             新增
           </Button>,
         ]}

@@ -24,6 +24,8 @@ export interface ApplicationBaseItem {
 
   // 描述
   desc?: string;
+
+  id?: number;
 }
 
 export type ApplicationItem = ApplicationBaseItem & IDateParam;
@@ -50,3 +52,7 @@ export type IGetApplicationDetailReq = {
   id?: number;
   code?: string;
 };
+
+export interface IGetAllApplicationListResp {
+  list: ApplicationItem[];
+}
