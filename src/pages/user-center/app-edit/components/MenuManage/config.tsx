@@ -98,7 +98,7 @@ export const getColumns = ({ Level, getLevelActions, getBaseActions, handleBaseA
       title: '层级操作',
       key: 'levelAction',
       fixed: 'right',
-      width: 330,
+      width: 300,
       render: (_: unknown, record: DataType) => {
         console.log({ _, record });
         const actions = getLevelActions(record);
@@ -117,7 +117,7 @@ export const getColumns = ({ Level, getLevelActions, getBaseActions, handleBaseA
       title: '基础操作',
       key: 'syncAction',
       fixed: 'right',
-      width: 200,
+      width: 180,
       render: (_: unknown, record: DataType) => {
         const actions = getBaseActions(record);
         return (

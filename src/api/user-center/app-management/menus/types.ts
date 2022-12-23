@@ -54,6 +54,7 @@ export const PageStatusEnums = [
 export enum MenuTypeEnum {
   Menu = 1,
   Page = 2,
+  Auth = 3,
 }
 
 export const MenuTypeEnums = [
@@ -65,6 +66,10 @@ export const MenuTypeEnums = [
     value: MenuTypeEnum.Page,
     label: '页面(有跳转地址)',
   },
+  {
+    value: MenuTypeEnum.Auth,
+    label: '权限',
+  },
 ];
 
 export const MenuTypeTableEnums = [
@@ -75,6 +80,10 @@ export const MenuTypeTableEnums = [
   {
     value: MenuTypeEnum.Page,
     label: '页面',
+  },
+  {
+    value: MenuTypeEnum.Auth,
+    label: '权限',
   },
 ];
 

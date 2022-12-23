@@ -135,9 +135,9 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
       temp = temp.filter((action) => action.code !== ActionCodeEnum.MoveUp);
     }
     // 菜单类型为页面无法添加子菜单
-    if (record[MenuFieldEnum.MenuType] === MenuTypeEnum.Page) {
-      temp = temp.filter((action) => action.code !== ActionCodeEnum.CreateSubMenu);
-    }
+    // if (record[MenuFieldEnum.MenuType] === MenuTypeEnum.Page) {
+    //   temp = temp.filter((action) => action.code !== ActionCodeEnum.CreateSubMenu);
+    // }
     return temp;
   };
 
@@ -190,16 +190,17 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
   };
 
   const getBaseActions = (record: DataType) => {
-    const { isShow } = record;
-    let temp = baseActions;
-    console.log({ ...tableProps });
+    const { isShow, menuType } = record;
+    if (menuType === MenuTypeEnum.Auth) {
+      return baseActions.filter((i) => ![ActionCodeEnum.DisplayMenu, ActionCodeEnum.HideMenu].includes(i.code));
+    }
     if (isShow === MenuShowEnum.Hidden) {
-      temp = baseActions.filter((i) => i.code !== ActionCodeEnum.HideMenu);
+      return baseActions.filter((i) => i.code !== ActionCodeEnum.HideMenu);
     }
     if (isShow === MenuShowEnum.Show) {
-      temp = baseActions.filter((i) => i.code !== ActionCodeEnum.DisplayMenu);
+      return baseActions.filter((i) => i.code !== ActionCodeEnum.DisplayMenu);
     }
-    return temp;
+    return baseActions;
   };
 
   const handleBaseActions = (code: ActionCodeEnum, record: DataType) => {
@@ -240,7 +241,7 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
           </>
         }
       />
-      <CustomTable columns={columns} scroll={{ x: 1500 }} {...tableExpandProps} {...tableProps} pagination={false} />
+      <CustomTable bordered size='middle' columns={columns} scroll={{ x: 1500 }} {...tableExpandProps} {...tableProps} pagination={false} />
       <MenuEditModal {...editModalInfo} code={code} onConfirm={reload} onClose={closeEditModal} />
     </div>
   );

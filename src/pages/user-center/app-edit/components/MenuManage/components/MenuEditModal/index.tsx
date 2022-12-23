@@ -31,9 +31,21 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
   const IRequest = useMemo(() => (isEdit ? postUpdateSystemMenu : postCreateSystemMenu), [isEdit]);
 
   useEffect(() => {
-    if (!visible) return;
-    isEdit ? form.setFieldsValue(data) : form.resetFields();
-  }, [visible, isEdit]);
+    if (visible) {
+      resetParams();
+    }
+  }, [visible]);
+
+  const resetParams = () => {
+    form.resetFields();
+    if (isEdit) {
+      return form.setFieldsValue(data);
+    }
+    const menuType = parent && parent.menuType === MenuTypeEnum.Page ? MenuTypeEnum.Auth : MenuTypeEnum.Page;
+    form.setFieldsValue({
+      menuType: menuType,
+    });
+  };
 
   const handleConfirm = async () => {
     try {
@@ -62,11 +74,17 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
     }
   };
 
+  const menuTypeEnum = useMemo(() => {
+    if (!parent) return MenuTypeEnums;
+    const isAuth = parent && parent.menuType === MenuTypeEnum.Page;
+    return MenuTypeEnums.filter((i) => (isAuth ? i.value === MenuTypeEnum.Auth : i.value !== MenuTypeEnum.Auth));
+  }, [parent]);
+
   return (
     <Modal
       title={isEdit ? '编辑菜单' : '新增菜单  '}
       maskClosable
-      width={500}
+      width={650}
       open={visible}
       confirmLoading={isLoading}
       onCancel={onClose}
@@ -76,25 +94,24 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
         <Form.Item label='上级菜单' name='_'>
           {(parent && parent[MenuFieldEnum.Name]) || '无'}
         </Form.Item>
-        <Form.Item label='菜单名称' name={MenuFieldEnum.Name} rules={[{ required: true, message: '请输入菜单名称' }]}>
-          <Input allowClear maxLength={64} placeholder='请输入菜单名称，限制最大64个字符' />
-        </Form.Item>
-        <Form.Item label='菜单编码' name={MenuFieldEnum.Code} rules={[{ required: true, message: '请输入菜单编码' }]}>
-          <Input allowClear maxLength={64} disabled={isEdit} placeholder='请输入菜单名称，限制最大64个字符' />
-        </Form.Item>
         <Form.Item
           label='菜单类型'
           name={MenuFieldEnum.MenuType}
-          initialValue={MenuTypeEnum.Menu}
           rules={[{ required: true, message: '请选择菜单类型' }]}
         >
           <Radio.Group disabled={isEdit}>
-            {MenuTypeEnums.map(({ value, label }) => (
+            {menuTypeEnum.map(({ value, label }) => (
               <Radio value={value} key={value}>
                 {label}
               </Radio>
             ))}
           </Radio.Group>
+        </Form.Item>
+        <Form.Item label='节点名称' name={MenuFieldEnum.Name} rules={[{ required: true, message: '请输入节点名称' }]}>
+          <Input allowClear maxLength={64} placeholder='请输入节点名称，限制最大64个字符' />
+        </Form.Item>
+        <Form.Item label='节点编码' name={MenuFieldEnum.Code} rules={[{ required: true, message: '请输入节点编码' }]}>
+          <Input allowClear maxLength={64} disabled={isEdit} placeholder='请输入节点编码，限制最大64个字符' />
         </Form.Item>
         <Form.Item
           noStyle
@@ -102,65 +119,75 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
             return prev?.[MenuFieldEnum.MenuType] !== old?.[MenuFieldEnum.MenuType];
           }}
         >
-          {({ getFieldValue }) =>
-            getFieldValue(MenuFieldEnum.MenuType) === MenuTypeEnum.Page && (
+          {({ getFieldValue }) => {
+            const menuType = getFieldValue(MenuFieldEnum.MenuType);
+            return (
               <>
-                <Form.Item
-                  label='页面打开方式'
-                  name={MenuFieldEnum.PageOpenMethod}
-                  initialValue={PageOpenEnum.Inline}
-                  rules={[{ required: true, message: '请选择页面打开方式' }]}
-                >
-                  <Radio.Group>
-                    {PageOpenEnums.map(({ value, label }) => (
-                      <Radio value={value} key={value}>
-                        {label}
-                      </Radio>
-                    ))}
-                  </Radio.Group>
-                </Form.Item>
-                <Form.Item
-                  label='页面路径'
-                  name={MenuFieldEnum.Url}
-                  rules={[
-                    { required: true, message: '请输入页面路径地址' },
-                    {
-                      validator: (_rule: any, url: string, callback: (msg?: string) => void) => {
-                        const isLinkTo = getFieldValue(MenuFieldEnum.PageOpenMethod) === PageOpenEnum.LinkTo;
-                        if (!isLinkTo) return callback();
-                        if (!url || Pattern.LINK_PATTERN.test(url)) return callback();
-                        callback('地址必须以 https:// 或者 http:// 开头');
-                      },
-                    },
-                  ]}
-                >
-                  <Input placeholder='请输入路径地址' />
-                </Form.Item>
+                {menuType !== MenuTypeEnum.Auth && (
+                  <>
+                    <Form.Item
+                      name={MenuFieldEnum.IsShow}
+                      label='菜单显示'
+                      initialValue={MenuShowEnum.Show}
+                      rules={[{ required: true, message: '请选择菜单显示' }]}
+                    >
+                      <Radio.Group>
+                        {MenuShowEnums.map(({ value, label }) => (
+                          <Radio value={value} key={value}>
+                            {label}
+                          </Radio>
+                        ))}
+                      </Radio.Group>
+                    </Form.Item>
+                    <Form.Item
+                      name={MenuFieldEnum.IconUrl}
+                      label='菜单Icon'
+                      extra='推荐图片比例 1:1，大小不超过 150kb，仅支持svg格式'
+                    >
+                      {/* <FormUploader size={150} uploadType={['svg']} /> */}
+                    </Form.Item>
+                  </>
+                )}
+                {menuType === MenuTypeEnum.Page && (
+                  <>
+                    <Form.Item
+                      label='页面打开方式'
+                      name={MenuFieldEnum.PageOpenMethod}
+                      initialValue={PageOpenEnum.Inline}
+                      rules={[{ required: true, message: '请选择页面打开方式' }]}
+                    >
+                      <Radio.Group>
+                        {PageOpenEnums.map(({ value, label }) => (
+                          <Radio value={value} key={value}>
+                            {label}
+                          </Radio>
+                        ))}
+                      </Radio.Group>
+                    </Form.Item>
+                    <Form.Item
+                      label='页面路径'
+                      name={MenuFieldEnum.Url}
+                      rules={[
+                        { required: true, message: '请输入页面路径地址' },
+                        {
+                          validator: (_rule: any, url: string, callback: (msg?: string) => void) => {
+                            const isLinkTo = getFieldValue(MenuFieldEnum.PageOpenMethod) === PageOpenEnum.LinkTo;
+                            if (!isLinkTo) return callback();
+                            if (!url || Pattern.LINK_PATTERN.test(url)) return callback();
+                            callback('地址必须以 https:// 或者 http:// 开头');
+                          },
+                        },
+                      ]}
+                    >
+                      <Input placeholder='请输入路径地址' />
+                    </Form.Item>
+                  </>
+                )}
               </>
-            )
-          }
+            );
+          }}
         </Form.Item>
-        <Form.Item
-          name={MenuFieldEnum.IsShow}
-          label='菜单显示'
-          initialValue={MenuShowEnum.Show}
-          rules={[{ required: true, message: '请选择菜单显示' }]}
-        >
-          <Radio.Group>
-            {MenuShowEnums.map(({ value, label }) => (
-              <Radio value={value} key={value}>
-                {label}
-              </Radio>
-            ))}
-          </Radio.Group>
-        </Form.Item>
-        <Form.Item
-          name={MenuFieldEnum.IconUrl}
-          label='菜单Icon'
-          extra='推荐图片比例 1:1，大小不超过 150kb，仅支持svg格式'
-        >
-          {/* <FormUploader size={150} uploadType={['svg']} /> */}
-        </Form.Item>
+
         <Form.Item name={MenuFieldEnum.Description} label='描述'>
           <Input.TextArea autoSize={false} maxLength={128} placeholder='请输入菜单描述，限制最大128个字符' showCount />
         </Form.Item>
