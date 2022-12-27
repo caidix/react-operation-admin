@@ -1,10 +1,12 @@
 import http from '@src/utils/request';
 import {
+  IDeleteOrganizationReq,
   IOrganizationListReq,
   IOrganizationListResp,
   IOrganizationUsersReq,
   IOrganizationUsersResp,
   IRelationOrganizationReq,
+  IUpdateOrganizationReq,
   UserGroupItem,
 } from './types';
 
@@ -12,12 +14,20 @@ export const getOrganizationList = (params: IOrganizationListReq) => {
   return http.get<IOrganizationListResp>('/organization/list', params);
 };
 
-export const postCreateOrganization = (data = {}) => {
-  return http.post('/organization/create-organization', data);
+export const getAllOrganizationList = () => {
+  return http.get<IOrganizationListResp>('/organization/all-list');
 };
 
-export const postUpdateOrganization = (data = {}) => {
-  return http.post('/organization/update-organization', data);
+export const postCreateOrganization = (data = {}) => {
+  return http.post('/organization/create', data);
+};
+
+export const postUpdateOrganization = (data: IUpdateOrganizationReq) => {
+  return http.post('/organization/update', data);
+};
+
+export const postDeleteOrganization = (data: IDeleteOrganizationReq) => {
+  return http.post('/organization/delete', data);
 };
 
 export const postOrganizationUsers = (data: IOrganizationUsersReq = {}) => {

@@ -8,6 +8,7 @@ import UserAppManagement from '@src/pages/user-center/app-management';
 import UserAppEdit from '@src/pages/user-center/app-edit';
 import AuthManagement from '@src/pages/user-center/auth-management';
 import RoleManagement from '@src/pages/user-center/user-role-management';
+import UserManagement from '@src/pages/user-center/user-management';
 import { RoutePath } from './config';
 import Auth from './util';
 
@@ -31,6 +32,7 @@ export const routes: IRouteConfig[] = [
     },
     children: [
       { path: RoutePath.HOME_PAGE, element: <HomePage /> },
+      { path: RoutePath.USER_MANAGEMENT, element: <UserManagement />, meta: { name: '用户管理' } },
       { path: RoutePath.USER_GROUP_MANAGEMENT, element: <UserGroupManagement />, meta: { name: '用户组管理' } },
       { path: RoutePath.USER_APPLICATION_MANAGEMENT, element: <UserAppManagement />, meta: { name: '应用管理' } },
       { path: RoutePath.USER_ROLE_MANAGEMENT, element: <RoleManagement />, meta: { name: '角色管理' } },

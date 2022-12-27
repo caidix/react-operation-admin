@@ -3,13 +3,11 @@ export interface UserGroupItem {
   name: string;
   desc: string;
   code: string;
-  managers?: number[];
-  users?: number[];
-  systems?: number[];
   isDelete?: boolean;
   createTime: string;
   updateTime: string;
   deleteTime: string;
+  parentId: number | string | null;
 }
 export interface UserItem {
   id: number;
@@ -20,8 +18,12 @@ export interface IOrganizationListReq extends IPagination {
   name?: string;
 }
 
-export interface IOrganizationListResp extends IPagination {
-  list: UserGroupItem[];
+export type IOrganizationListResp = UserGroupItem[];
+
+export type IUpdateOrganizationReq = UserGroupItem;
+
+export interface IDeleteOrganizationReq {
+  id: number;
 }
 
 export interface IOrganizationUsersReq extends IPagination {

@@ -37,4 +37,7 @@ export enum ActionCodeEnum {
   DisplayMenu = 'displayMenu',
   /** 设置隐藏 */
   HideMenu = 'hideMenu',
+
+  CreateOrganization = 'createOrganization',
+  UpdateOrganization = 'updateOrganization',
 }

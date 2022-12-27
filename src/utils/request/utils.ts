@@ -21,7 +21,7 @@ export class HttpError extends Error {
  */
 export async function requestExecute<P, R = any>(
     asyncTask: (param: P) => Promise<R>,
-    params: P,
+    params?: P,
     options?: {
       trim?: boolean;
     },
