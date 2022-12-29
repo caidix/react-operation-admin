@@ -70,7 +70,7 @@ const UserRegister: React.FC<UserRegisterProps> = (props) => {
         <CountInput placeholder='验证码，5分钟内有效' countProps={{ beforeStartFunc: fetchverifyCode }} />
       </Form.Item>
       <Form.Item name='password' rules={[{ required: true, message: '请输入密码' }]}>
-        <StrengthMeter placeholder='密码' />
+        <StrengthMeter placeholder='密码' minLength={6} maxLength={16} />
       </Form.Item>
       <Form.Item
         name='nextPassword'
@@ -87,7 +87,7 @@ const UserRegister: React.FC<UserRegisterProps> = (props) => {
           }),
         ]}
       >
-        <Input.Password placeholder='确认密码' />
+        <Input.Password placeholder='确认密码' minLength={6} maxLength={16} />
       </Form.Item>
       <Button type='primary' htmlType='submit' loading={isLoading} className={styles.login_button}>
         注册

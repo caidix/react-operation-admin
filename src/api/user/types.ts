@@ -3,7 +3,16 @@ export interface UserItem {
   name: string;
   password: string;
   email: string;
-  verifyCode: string;
+  status: UserStatusEnum;
+  phone?: string;
+  isSuper?: boolean;
+  verifyCode?: string;
+  organization?: number;
+}
+
+export enum UserStatusEnum {
+  Active = 1,
+  Disable = 2,
 }
 
 export interface ILoginReq {
@@ -22,6 +31,8 @@ export interface IRegisterReq {
   verifyCode: string;
 }
 
-export type IGetUserListReq = {
-  [propsName: string]: any;
-} & IPagination;
+export type IGetUserListReq = Partial<UserItem> & IPagination;
+
+export type IPostCreateUserReq = PartialByKeys<UserItem, 'id'>;
+
+export type IPostUpdateUserReq = UserItem;
