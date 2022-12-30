@@ -36,3 +36,7 @@ export type IGetUserListReq = Partial<UserItem> & IPagination;
 export type IPostCreateUserReq = PartialByKeys<UserItem, 'id'>;
 
 export type IPostUpdateUserReq = UserItem;
+
+export interface IPostDeleteUserReq {
+  userIds: Array<number | string>;
+}

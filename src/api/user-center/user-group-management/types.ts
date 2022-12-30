@@ -38,3 +38,8 @@ export interface IRelationOrganizationReq {
   id: number;
   userIds: number[];
 }
+
+export interface IBatchTransferOrgUsersReq {
+  userIds: Array<string | number>;
+  organization: number;
+}

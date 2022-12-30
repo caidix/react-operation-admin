@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, message, Tooltip, Space, Tree, Dropdown, Menu, Input } from 'antd';
+import { Button, message, Tooltip, Space, Tree, Dropdown, Menu, Input, Table, Popconfirm } from 'antd';
 import ContainerLayout from '@src/layout/ContentLayout';
 import { ProTable, ActionType, ProCard } from '@ant-design/pro-components';
 import {
@@ -13,6 +13,7 @@ import {
 
 import { useBoolean, useSetState, useUpdateEffect } from 'ahooks';
 import {
+  batchTransferUsers,
   getAllOrganizationList,
   postCreateOrganization,
   postDeleteOrganization,
@@ -23,12 +24,14 @@ import { listToTree } from '@src/utils/format';
 import { AntTreeNode, DataNode } from 'antd/lib/tree';
 import { IDeleteOrganizationReq, UserGroupItem } from '@src/api/user-center/user-group-management/types';
 import { ActionCodeEnum, EMPTY_TABLE } from '@src/consts';
-import { getUserList, postCreateUser, postUpdateUser } from '@src/api/user';
+import { getUserList, postCreateUser, postDeleteUser, postUpdateUser } from '@src/api/user';
 import { IGetUserListReq, UserItem } from '@src/api/user/types';
 import type { ProColumns, ProFormInstance } from '@ant-design/pro-components';
 import styles from './index.module.less';
 import OrganizationEdit from './components/organization-edit';
 import UserEdit from './components/user-edit';
+import BatchTransfer from './components/batch-transfer';
+import Split from '@src/components/Split';
 
 type UserTreeItem = DataNode & UserGroupItem;
 
@@ -42,6 +45,10 @@ const UserManagement: React.FC = () => {
   const [userInfo, setUserInfo] = useSetState<{ open: boolean; data: null | UserItem }>({
     open: false,
     data: null,
+  });
+  const [batchInfo, setBatchInfo] = useSetState<{ open: boolean; data: undefined | Array<string | number> }>({
+    open: false,
+    data: undefined,
   });
   const [list, setList] = useSetState<{
     organizationList: UserTreeItem[];
@@ -60,6 +67,10 @@ const UserManagement: React.FC = () => {
 
   const changeUserStatus = (open = false) => {
     setUserInfo({ open, data: null });
+  };
+
+  const changeBatchStatus = (open = false) => {
+    setBatchInfo({ open, data: undefined });
   };
 
   const fetchOrganizationList = async () => {
@@ -139,6 +150,37 @@ const UserManagement: React.FC = () => {
     changeUserStatus();
   };
 
+  const handleBatchTransferUsers = async (data: { organization: number }) => {
+    const { organization } = data;
+    if (organization === list?.selected?.id) {
+      return message.info('当前用户已在该组织下，请重新选择');
+    }
+    if (!batchInfo.data) {
+      return message.error('当前未选中用户');
+    }
+    const [err] = await requestExecute(batchTransferUsers, {
+      organization,
+      userIds: batchInfo.data,
+    });
+    if (err) {
+      return;
+    }
+    message.success('转移用户成功');
+    userTableRef.current?.submit();
+    changeBatchStatus();
+  };
+
+  const handleDeleteUsers = async (userIds: Array<string | number>) => {
+    const [err] = await requestExecute(postDeleteUser, {
+      userIds,
+    });
+    if (err) {
+      return;
+    }
+    message.success('删除用户成功');
+    userTableRef.current?.submit();
+  };
+
   useEffect(() => {
     fetchOrganizationList();
   }, []);
@@ -199,6 +241,11 @@ const UserManagement: React.FC = () => {
       key: 'nick',
     },
     {
+      title: '所属组织',
+      dataIndex: 'orgName',
+      key: 'orgName',
+    },
+    {
       title: '创建时间',
       width: 140,
       key: 'createTime',
@@ -214,13 +261,18 @@ const UserManagement: React.FC = () => {
     },
     {
       title: '操作',
-      width: 80,
+      width: 140,
       key: 'option',
       valueType: 'option',
       render: (_: unknown, data: UserItem) => (
-        <Button type='link' onClick={() => setUserInfo({ data, open: true })}>
-          编辑
-        </Button>
+        <Split type='button'>
+          <Button type='link' onClick={() => setUserInfo({ data, open: true })}>
+            编辑
+          </Button>
+          <Popconfirm title='确认删除吗?' onConfirm={() => handleDeleteUsers([data.id])}>
+            <a>删除</a>
+          </Popconfirm>
+        </Split>
       ),
     },
   ];
@@ -278,13 +330,40 @@ const UserManagement: React.FC = () => {
                 <Button type='primary' onClick={() => changeUserStatus(true)}>
                   新增
                 </Button>,
-                <Button onClick={fetchOrganizationList} loading={isOrgListLoading}>
-                  转移
-                </Button>,
-                <Button onClick={fetchOrganizationList} loading={isOrgListLoading}>
-                  删除
-                </Button>,
               ]}
+              rowSelection={{
+                selectedRowKeys: batchInfo.data,
+                onChange(selectedRowKeys) {
+                  setBatchInfo({ data: selectedRowKeys });
+                },
+              }}
+              tableAlertRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => (
+                <span>已选 {selectedRowKeys.length} 项</span>
+              )}
+              tableAlertOptionRender={({ selectedRowKeys, onCleanSelected }) => {
+                return (
+                  <>
+                    <Button type='link' onClick={onCleanSelected}>
+                      取消选择
+                    </Button>
+                    <Button
+                      type='link'
+                      onClick={() => {
+                        setBatchInfo({
+                          open: true,
+                          data: selectedRowKeys,
+                        });
+                      }}
+                      loading={isOrgListLoading}
+                    >
+                      批量转移
+                    </Button>
+                    <Button type='link' onClick={() => handleDeleteUsers(selectedRowKeys)} loading={isOrgListLoading}>
+                      批量删除
+                    </Button>
+                  </>
+                );
+              }}
               headerTitle='成员列表'
               columnsState={{
                 persistenceKey: 'org-user-list',
@@ -303,6 +382,12 @@ const UserManagement: React.FC = () => {
           onClose={changeOrgStatus}
         />
         <UserEdit {...userInfo} list={list.organizationList} onSubmit={handleUpdateUser} onClose={changeUserStatus} />
+        <BatchTransfer
+          open={batchInfo.open}
+          list={list.organizationList}
+          onSubmit={handleBatchTransferUsers}
+          onClose={changeBatchStatus}
+        />
       </div>
     </ContainerLayout>
   );

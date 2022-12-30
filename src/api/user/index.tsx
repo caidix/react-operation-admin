@@ -4,6 +4,7 @@ import {
   IGetUserListReq,
   ILoginReq,
   IPostCreateUserReq,
+  IPostDeleteUserReq,
   IPostUpdateUserReq,
   IRegisterReq,
 } from './types';
@@ -22,6 +23,10 @@ export const postCreateUser = (data: IPostCreateUserReq) => {
 
 export const postUpdateUser = (data: IPostUpdateUserReq) => {
   return http.post('/user/update', data);
+};
+
+export const postDeleteUser = (data: IPostDeleteUserReq) => {
+  return http.post('/user/delete', data);
 };
 
 /**

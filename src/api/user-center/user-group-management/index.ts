@@ -1,5 +1,6 @@
 import http from '@src/utils/request';
 import {
+  IBatchTransferOrgUsersReq,
   IDeleteOrganizationReq,
   IOrganizationListReq,
   IOrganizationListResp,
@@ -28,6 +29,10 @@ export const postUpdateOrganization = (data: IUpdateOrganizationReq) => {
 
 export const postDeleteOrganization = (data: IDeleteOrganizationReq) => {
   return http.post('/organization/delete', data);
+};
+
+export const batchTransferUsers = (data: IBatchTransferOrgUsersReq) => {
+  return http.post('/organization/transfer', data);
 };
 
 export const postOrganizationUsers = (data: IOrganizationUsersReq = {}) => {
