@@ -4,9 +4,6 @@
 export interface ApplicationBaseItem {
   name: string;
 
-  // 组织归属
-  organization: number;
-
   // 应用编码
   code: string;
 

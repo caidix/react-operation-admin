@@ -15,8 +15,6 @@ export enum ColumnEnum {
   Description = 'desc',
   /** 资源地址 */
   ResourcesUrl = 'resourcesUrl',
-  /** 组织归属 */
-  Organization = 'organization',
   /** 访问地址 */
   Url = 'url',
   /** LOGO */
@@ -31,17 +29,11 @@ export enum ColumnEnum {
   BaseActions = 'baseActions',
 }
 
-export interface OrganizationListItem {
-  name: string;
-  code: string;
-}
-
 interface IColumnProps {
-  organizationList: OrganizationListItem[];
   handleBaseActions(R: ApplicationItem, code: ActionCodeEnum): void;
 }
 
-export const getColumns = ({ handleBaseActions, organizationList }: IColumnProps) => {
+export const getColumns = ({ handleBaseActions }: IColumnProps) => {
   return [
     {
       title: '应用名称',
@@ -70,16 +62,6 @@ export const getColumns = ({ handleBaseActions, organizationList }: IColumnProps
       key: ColumnEnum.ResourcesUrl,
       width: 160,
       ellipsis: true,
-    },
-    {
-      title: '所属用户组',
-      dataIndex: ColumnEnum.Organization,
-      key: ColumnEnum.Organization,
-      width: 160,
-      ellipsis: true,
-      render: (data: string) => {
-        return organizationList.find(({ code }) => code === data)?.name;
-      },
     },
     {
       title: '创建时间',

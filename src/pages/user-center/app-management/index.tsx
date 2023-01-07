@@ -5,18 +5,17 @@ import PageHeader from '@src/layout/PageHeader';
 import useAntdTable from '@src/hooks/use-antd-table';
 import ColumnSetting, { ColumnSettingProps } from '@src/components/ColumnsFilter/Filter';
 import CustomTable from '@src/components/CustomTable';
-import { useRequest, useSetState } from 'ahooks';
 import { requestExecute } from '@src/utils/request/utils';
 import { ActionCodeEnum, EMPTY_OPTION, EMPTY_TABLE } from '@src/consts';
 import { ApplicationItem } from '@src/api/user-center/app-management/application/types';
 import { getApplicationList } from '@src/api/user-center/app-management/application';
-import { FilterColumnType } from '@src/components/ColumnsFilter';
-import { getUserOrganizations } from '@src/api/user-center/user-group-management';
 
 import { useNavigate } from 'react-router-dom';
 import { RoutePath } from '@src/routes/config';
-import { getColumns, OrganizationListItem } from './config';
+import Split from '@src/components/Split';
+import { baseActions, ColumnEnum, getColumns } from './config';
 import EditApplicationModal from './components/EditApplicationModal';
+import { ProColumns, ProTable } from '@ant-design/pro-components';
 
 const { Option } = Select;
 
@@ -25,7 +24,6 @@ const ApplicationManagement: React.FC = () => {
   const navigate = useNavigate();
   /* 新增弹窗 */
   const [visibleEditModal, setVisibleEditModal] = useState<boolean>(false);
-  const [organizationList, setOrganizationList] = useState<OrganizationListItem[]>([]);
 
   const { tableProps, search } = useAntdTable(
     async ({ current, pageSize }, formData: any) => {
@@ -56,25 +54,81 @@ const ApplicationManagement: React.FC = () => {
     }
   }
 
-  const columns = getColumns({ handleBaseActions, organizationList });
-
-  const [curColumns, setCurColumns] = useState<FilterColumnType<any>[]>(columns);
-  const filterProps: ColumnSettingProps = {
-    columns,
-    columnsState: { privateKey: 'app-manage', storageType: 'localStorage' },
-    callback: setCurColumns,
-  };
-
+  const columns: ProColumns<ApplicationItem>[] = [
+    {
+      title: '应用名称',
+      dataIndex: ColumnEnum.Name,
+      key: ColumnEnum.Name,
+      width: 160,
+      ellipsis: true,
+    },
+    {
+      title: '应用编码',
+      dataIndex: ColumnEnum.Code,
+      width: 160,
+    },
+    {
+      title: '描述',
+      dataIndex: ColumnEnum.Description,
+      key: ColumnEnum.Description,
+      width: 160,
+      ellipsis: true,
+      hideInSearch: true,
+    },
+    {
+      title: '资源地址',
+      dataIndex: ColumnEnum.ResourcesUrl,
+      key: ColumnEnum.ResourcesUrl,
+      width: 160,
+      ellipsis: true,
+      hideInSearch: true,
+    },
+    {
+      title: '创建时间',
+      dataIndex: ColumnEnum.CreateTime,
+      key: ColumnEnum.CreateTime,
+      width: 170,
+      ellipsis: true,
+      hideInSearch: true,
+    },
+    {
+      title: '更新时间',
+      dataIndex: ColumnEnum.UpdateTime,
+      key: ColumnEnum.UpdateTime,
+      width: 170,
+      ellipsis: true,
+      hideInSearch: true,
+    },
+    {
+      title: '操作',
+      dataIndex: ColumnEnum.BaseActions,
+      key: ColumnEnum.BaseActions,
+      valueType: 'option',
+      width: 90,
+      fixed: 'right',
+      render: (_: unknown, record: ApplicationItem) => {
+        return (
+          <Split type='button'>
+            {baseActions.map(({ code, name }) => (
+              <Button onClick={() => handleBaseActions(record, code)} type='link' size='small' key={code}>
+                {name}
+              </Button>
+            ))}
+          </Split>
+        );
+      },
+    },
+  ];
   /** 获取所有用户组 */
-  useRequest(getUserOrganizations, {
-    cacheKey: 'getUserOrganizations',
-    onSuccess: (res) => {
-      setOrganizationList([EMPTY_OPTION, ...res]);
-    },
-    onError: () => {
-      setOrganizationList([EMPTY_OPTION]);
-    },
-  });
+  // useRequest(getUserOrganizations, {
+  //   cacheKey: 'getUserOrganizations',
+  //   onSuccess: (res) => {
+  //     setOrganizationList([EMPTY_OPTION, ...res]);
+  //   },
+  //   onError: () => {
+  //     setOrganizationList([EMPTY_OPTION]);
+  //   },
+  // });
 
   const Header = (
     <Form form={form}>
@@ -83,23 +137,6 @@ const ApplicationManagement: React.FC = () => {
         <Col span={8}>
           <Form.Item shouldUpdate label='名称或编码' name='search'>
             <Input placeholder='请输入应用名称或编码' allowClear />
-          </Form.Item>
-        </Col>
-        <Col span={8}>
-          <Form.Item label='所属用户组' name='organization'>
-            <Select
-              placeholder='请选择用户组'
-              showSearch
-              defaultValue={EMPTY_OPTION.code}
-              optionFilterProp='label'
-              onSelect={submit}
-            >
-              {organizationList.map((org) => (
-                <Option key={org.code} value={org.code} label={org.name}>
-                  {org.name}
-                </Option>
-              ))}
-            </Select>
           </Form.Item>
         </Col>
         <Col span={8}>
@@ -116,18 +153,17 @@ const ApplicationManagement: React.FC = () => {
 
   return (
     <ContainerLayout title='应用管理' header={Header}>
-      <PageHeader
-        rightCtn={
-          <>
-            <Button onClick={() => setVisibleEditModal(true)} className='mr-2' type='primary'>
-              新增应用
-            </Button>
-            <ColumnSetting {...filterProps} />
-          </>
-        }
-      />
       <EditApplicationModal visible={visibleEditModal} onConfirm={reload} onClose={() => setVisibleEditModal(false)} />
-      <CustomTable columns={curColumns} scroll={{ x: 1500 }} {...tableProps} />
+      <ProTable
+        toolBarRender={() => [
+          <Button onClick={() => setVisibleEditModal(true)} className='mr-2' type='primary'>
+            新增应用
+          </Button>,
+        ]}
+        scroll={{ x: 1500 }}
+        {...tableProps}
+        columns={columns}
+      />
     </ContainerLayout>
   );
 };
