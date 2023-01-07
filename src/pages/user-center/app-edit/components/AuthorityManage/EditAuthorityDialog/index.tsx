@@ -73,7 +73,7 @@ const EditAuthorityDialog: FC<EditAuthMenuProps> = (props) => {
             rules={[
               {
                 validator(_, value, callback) {
-                  return callback(!value || !trim(value) ? '功能点名称必填' : undefined);
+                  return callback(!value || !trim(value) ? '功能点名称不得为空' : undefined);
                 },
               },
             ]}

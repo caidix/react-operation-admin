@@ -1,150 +1,114 @@
 import React, { useRef, useState } from 'react';
-import { Button, message } from 'antd';
+import { Button, Input, message } from 'antd';
 import ContainerLayout from '@src/layout/ContentLayout';
 import { ProTable, ActionType } from '@ant-design/pro-components';
-import { IOrganizationListReq, UserGroupItem } from '@src/api/user-center/user-group-management/types';
-import { getOrganizationList } from '@src/api/user-center/user-group-management';
 
-import { useSetState } from 'ahooks';
-import { requestExecute } from '@src/utils/request/utils';
-import { ActionCodeEnum, EMPTY_TABLE } from '@src/consts';
+import { useRequest, useSetState } from 'ahooks';
 import useUserInfo from '@src/hooks/use-user-info';
-import EditGroupModal from './components/EditGroupModal';
-import { getColumns } from './config';
-import UserPicker from './components/UserPicker';
 import { useNavigate } from 'react-router-dom';
+import { getAllRoleGroups } from '@src/api/user-center/role';
+import classnames from 'classnames';
 
-interface AppModelInfo {
+import { RoleGroupItem, RoleItem } from '@src/api/user-center/role/types';
+import EditRoleModal from './components/edit-role-modal';
+
+import styles from './index.module.less';
+import { RoleParams, RoleType } from './types';
+import { EditOutlined } from '@ant-design/icons';
+
+interface RoleModelInfo {
   visible: boolean;
-  data: null | UserGroupItem;
+  data: RoleParams;
+  type: RoleType;
 }
-
+const { Search } = Input;
 const UserGroupManagement: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [_, { isManager }] = useUserInfo();
 
-  /* 新增编辑弹窗 */
-  const [appModalInfo, setModalInfo] = useSetState<AppModelInfo>({
+  const [currentGroup, setCurrentGroup] = useState<RoleGroupItem | null>(null);
+  const [currentHoverGroup, setCurrentHoverGroup] = useState(-1);
+  const [roleModalInfo, setModalInfo] = useSetState<RoleModelInfo>({
     visible: false,
     data: null,
-  });
-  const [userPickInfo, setUserPickInfo] = useSetState<AppModelInfo>({
-    visible: false,
-    data: null,
+    type: RoleType.Group,
   });
 
-  const changeModelInfo = (data: null | UserGroupItem = null) => {
+  const changeModelInfo = (data: RoleParams = null, type: RoleType = RoleType.Group) => {
     setModalInfo({
-      visible: !appModalInfo.visible,
+      visible: !roleModalInfo.visible,
       data,
-    });
-  };
-  const changeUserInfo = (data: null | UserGroupItem = null) => {
-    setUserPickInfo({
-      visible: !userPickInfo.visible,
-      data,
+      type,
     });
   };
 
-  const request = async (params: IOrganizationListReq) => {
-    const [err, res] = await requestExecute(getOrganizationList, {
-      ...params,
-    });
-
-    if (err) {
-      message.error(err.message);
-      return EMPTY_TABLE;
-    }
-    return {
-      data: res.list,
-      total: res.total || 0,
-      success: true,
-    };
-  };
-
-  const reload = () => {
-    actionRef?.current?.reload();
-  };
   const navigate = useNavigate();
-  /** 基础编辑操作 */
-  const handleBaseActions = (record: UserGroupItem, code: ActionCodeEnum) => {
-    if (code === ActionCodeEnum.Update) {
-      return changeModelInfo(record);
-    }
-    if (code === ActionCodeEnum.UpdateApp) {
-      return navigate('/user/app-auth-management', { state: record });
-    }
-    changeUserInfo(record);
-  };
 
-  const columns = getColumns({ handleBaseActions, isManager });
+  const { data, run, refresh } = useRequest(getAllRoleGroups, {
+    // onSuccess: (data, params) => {
+    //   console.log(data, params);
+    //   return data.list;
+    // },
+  });
+
+  const onSearch = () => {};
+
+  const handleRoleModal = () => {
+    if (roleModalInfo.type === RoleType.Group) {
+      refresh();
+    }
+  };
 
   return (
-    <ContainerLayout
-      title='用户组管理'
-      custom
-      header={
-        <>
-          <div>1. 每个用户组独立管理自己组内的应用，类似于需求小组的形式</div>
-          <div>
-            2. 管理员可以管理用户组的成员以及管理的分发，组内的成员拥有该组内分配的权限，管理员拥有组内应用所有的权限
+    <ContainerLayout title='后台角色管理' custom>
+      <div className='flex p-4'>
+        <div className={styles.left}>
+          <div className={styles.header}>
+            <div className={styles.title}>角色分组</div>
+            <Button size='small' type='primary' onClick={() => changeModelInfo()}>
+              新增分组
+            </Button>
           </div>
-          <div>3. 更细粒度的分发则可以以组为维度再新增角色的概念，这里不做开发</div>
-        </>
-      }
-    >
-      <ProTable<UserGroupItem>
-        className='m-4'
-        actionRef={actionRef}
-        columns={columns}
-        cardBordered
-        request={request}
-        editable={{
-          type: 'multiple',
-        }}
-        columnsState={{
-          persistenceKey: 'pro-table-singe-demos',
-          persistenceType: 'localStorage',
-          onChange(value) {
-            console.log('value: ', value);
-          },
-        }}
-        scroll={{ x: 1300 }}
-        rowKey='id'
-        search={{
-          labelWidth: 'auto',
-        }}
-        options={{
-          setting: {
-            listsHeight: 400,
-          },
-        }}
-        pagination={{
-          pageSize: 10,
-        }}
-        dateFormatter='string'
-        headerTitle='高级表格'
-        toolBarRender={() => [
-          <Button
-            onClick={() => {
-              changeModelInfo();
-            }}
-            className='mr-2'
-            type='primary'
-          >
-            新增
-          </Button>,
-        ]}
-      />
-      <EditGroupModal
-        {...appModalInfo}
-        onConfirm={() => {
-          changeModelInfo();
-          reload();
-        }}
+          <div className={styles.choosed}>当前选中分组：{currentGroup?.name}</div>
+          <Search placeholder='input search text' allowClear onSearch={onSearch} />
+          <div className={styles['left-content']} onMouseLeave={() => setCurrentHoverGroup(-1)}>
+            {data &&
+              data.list.map((item) => {
+                return (
+                  <div
+                    className={classnames([
+                      styles['left-item'],
+                      currentGroup?.id === item.id ? styles['left-item--active'] : '',
+                    ])}
+                    onClick={() => setCurrentGroup(item)}
+                    onMouseEnter={() => setCurrentHoverGroup(item.id)}
+                  >
+                    <span>{item.name}</span>
+                    {currentHoverGroup === item.id && (
+                      <>
+                        <EditOutlined onClick={() => changeModelInfo(item)} />
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+          </div>
+        </div>
+        <div className={styles.right}>
+          <div className={styles.header}>
+            <div className={styles.title}>角色列表</div>
+            <Button size='small' type='primary' onClick={() => changeModelInfo(null, RoleType.Item)}>
+              新增角色
+            </Button>
+          </div>
+        </div>
+      </div>
+      <EditRoleModal
+        {...roleModalInfo}
+        onConfirm={handleRoleModal}
         onClose={changeModelInfo}
+        groupList={data?.list ?? []}
       />
-      <UserPicker {...userPickInfo} onClose={changeUserInfo} />
     </ContainerLayout>
   );
 };

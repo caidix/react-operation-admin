@@ -73,7 +73,6 @@ const BatchTransfer = (props: IProps) => {
         fieldProps={{
           fieldNames: {
             label: 'name',
-            key: 'id',
             value: 'id',
           },
           treeData: list,

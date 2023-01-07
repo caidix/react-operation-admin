@@ -108,7 +108,7 @@ const OrganizationEdit = (props: IProps) => {
           maxLength: 24,
         }}
         placeholder='请输入名称，最长为 24 位'
-        rules={[{ required: true, message: '部门名称必填' }]}
+        rules={[{ required: true, message: '部门名称不得为空' }]}
       />
       <ProFormTreeSelect
         required
@@ -118,16 +118,15 @@ const OrganizationEdit = (props: IProps) => {
         fieldProps={{
           fieldNames: {
             label: 'name',
-            key: 'id',
             value: 'id',
           },
           treeData: treeList,
           showCheckedStrategy: TreeSelect.SHOW_PARENT,
           placeholder: '请选择上级组织',
         }}
-        rules={[{ required: true, message: '上级组织必填' }]}
+        rules={[{ required: true, message: '上级组织不得为空' }]}
       />
-      <ProFormTextArea name='desc' label='概述' />{' '}
+      <ProFormTextArea name='desc' label='概述' />
       <ProFormDigit
         extra='数字越大权重越高'
         label='权重'
