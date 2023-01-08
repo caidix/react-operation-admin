@@ -5,7 +5,7 @@ import { requestExecute } from '@src/utils/request/utils';
 import { postCreateOrganization, postUpdateOrganization } from '@src/api/user-center/user-group-management';
 import { Pattern } from '@src/utils/validate';
 import { ModalForm, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { postCreateRoleGroup, postUpdateRoleGroup } from '@src/api/user-center/role';
+import { postCreateRole, postCreateRoleGroup, postUpdateRole, postUpdateRoleGroup } from '@src/api/user-center/role';
 import { RoleGroupItem } from '@src/api/user-center/role/types';
 import { ColumnEnum } from '../../config';
 import { RoleParams, RoleType } from '../../types';
@@ -21,6 +21,8 @@ interface IProps {
 const requestEnum = {
   ['true' + RoleType.Group]: postUpdateRoleGroup,
   ['false' + RoleType.Group]: postCreateRoleGroup,
+  ['true' + RoleType.Item]: postUpdateRole,
+  ['false' + RoleType.Item]: postCreateRole,
 };
 const EditGroupModal: React.FC<IProps> = (props) => {
   const { data, visible, type, groupList, onClose, onConfirm } = props;
