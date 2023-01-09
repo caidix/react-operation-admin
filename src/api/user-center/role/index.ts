@@ -1,7 +1,9 @@
 import http from '@src/utils/request';
 import {
   IGetAllRoleGroupsResp,
-  IGetRoleLIstReq,
+  IGetAllRolesReq,
+  IGetAllRolesResp,
+  IGetRoleListReq,
   IGetRoleListResp,
   IPostCreateRoleGroupReq,
   IPostCreateRoleReq,
@@ -27,8 +29,12 @@ export const postUpdateRoleGroup = (data: IPostUpdateRoleGroupReq) => {
 /**
  * 角色
  */
-export const getRoleList = (params: IGetRoleLIstReq) => {
+export const getRoleList = (params: IGetRoleListReq) => {
   return http.get<IGetRoleListResp>('/role/list', params);
+};
+
+export const getAllRoles = (params: IGetAllRolesReq) => {
+  return http.get<IGetAllRolesResp>('/role/all-list', params);
 };
 
 export const postCreateRole = (data: IPostCreateRoleReq) => {

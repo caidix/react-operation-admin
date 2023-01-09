@@ -18,8 +18,9 @@ export interface RoleGroupItem {
 export interface RoleItem {
   id: number;
   name: string;
-  desc?: string;
   roleGroupId: number;
+  desc?: string;
+  group?: RoleGroupItem;
 }
 
 export type IPostCreateRoleGroupReq = Omit<RoleGroupItem, 'id'>;
@@ -31,12 +32,16 @@ export interface IGetAllRoleGroupsResp {
   list: RoleGroupItem[];
 }
 
-export type IGetRoleLIstReq = IPagination & Partial<RoleItem>;
+export type IGetRoleListReq = IPagination & Partial<RoleItem>;
 export type IPostCreateRoleReq = Omit<RoleItem, 'id'>;
 export type IPostUpdateRoleReq = RoleItem;
 
 export type RoleListItem = RoleItem & IDateParam;
 
 export interface IGetRoleListResp extends IPagination {
+  list: RoleListItem[];
+}
+export type IGetAllRolesReq = Partial<RoleItem>;
+export interface IGetAllRolesResp {
   list: RoleListItem[];
 }
