@@ -9,10 +9,10 @@ import { useSetState } from 'ahooks';
 import { requestExecute } from '@src/utils/request/utils';
 import { ActionCodeEnum, EMPTY_TABLE } from '@src/consts';
 import useUserInfo from '@src/hooks/use-user-info';
+import { useNavigate } from 'react-router-dom';
 import EditGroupModal from './components/EditGroupModal';
 import { getColumns } from './config';
 import UserPicker from './components/UserPicker';
-import { useNavigate } from 'react-router-dom';
 
 interface AppModelInfo {
   visible: boolean;

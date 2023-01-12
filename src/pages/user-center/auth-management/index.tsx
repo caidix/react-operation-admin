@@ -2,6 +2,7 @@ import { getAllApplicationList } from '@src/api/user-center/app-management';
 import { ApplicationItem } from '@src/api/user-center/app-management/application/types';
 import { getAllRoles } from '@src/api/user-center/role';
 import { IGetAllRolesResp, RoleListItem } from '@src/api/user-center/role/types';
+import ColumnPanel from '@src/components/ColumnPanel';
 import ContainerLayout from '@src/layout/ContentLayout';
 import { requestExecute } from '@src/utils/request/utils';
 import { useBoolean, useRequest, useSetState } from 'ahooks';
@@ -73,6 +74,14 @@ const AuthManagement = () => {
     }
   };
 
+  const fetchSystemList = async () => {
+    const [err, res] = await requestExecute(getAllApplicationList);
+    if (err) {
+      return;
+    }
+    console.log({ res });
+  };
+
   const handleSearchRole = (search: string) => {
     setSearchRole(search);
     formatRoles(roleList.list, search);
@@ -95,18 +104,13 @@ const AuthManagement = () => {
 
   useEffect(() => {
     fetchData();
+    fetchSystemList();
   }, []);
 
   return (
     <ContainerLayout title='后台权限管理' custom>
-      <div className='flex p-4'>
-        <div className={styles.left}>
-          <div className={styles.header}>
-            <div className={styles.title}>角色列表</div>
-            <Button size='small' type='primary'>
-              新增分组
-            </Button>
-          </div>
+      <ColumnPanel leftTitle='角色列表' rightTitle='权限列表'>
+        <div slot='left'>
           <div className={styles.choosed}>当前选中角色：{}</div>
           <Search placeholder='请输入分组名称' allowClear onSearch={handleSearchRole} />
           <div className={styles['left-content']}>
@@ -121,15 +125,8 @@ const AuthManagement = () => {
             />
           </div>
         </div>
-        <div className={styles.right}>
-          <div className={styles.header}>
-            <div className={styles.title}>权限配置</div>
-            <Button size='small' type='primary'>
-              新增角色
-            </Button>
-          </div>
-        </div>
-      </div>
+        <div slot='right'></div>
+      </ColumnPanel>
     </ContainerLayout>
   );
 };

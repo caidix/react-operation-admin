@@ -4,21 +4,20 @@ import ContainerLayout from '@src/layout/ContentLayout';
 import { ProTable, ActionType, ProColumns } from '@ant-design/pro-components';
 
 import { useAntdTable, useRequest, useSetState } from 'ahooks';
-import useUserInfo from '@src/hooks/use-user-info';
-import { useNavigate } from 'react-router-dom';
 import { getAllRoleGroups, getRoleList } from '@src/api/user-center/role';
 import classnames from 'classnames';
 
-import { RoleGroupItem, RoleItem, RoleListItem } from '@src/api/user-center/role/types';
-import EditRoleModal from './components/edit-role-modal';
+import { RoleGroupItem, RoleListItem } from '@src/api/user-center/role/types';
 
-import styles from './index.module.less';
-import { RoleParams, RoleType } from './types';
 import { EditOutlined } from '@ant-design/icons';
 import { EMPTY_TABLE } from '@src/consts';
 import { requestExecute } from '@src/utils/request/utils';
 import Split from '@src/components/Split';
+import ColumnPanel from '@src/components/ColumnPanel';
+import { RoleParams, RoleType } from './types';
+import EditRoleModal from './components/edit-role-modal';
 
+import styles from './index.module.less';
 interface RoleModelInfo {
   visible: boolean;
   data: RoleParams;
@@ -88,7 +87,7 @@ const UserGroupManagement: React.FC = () => {
     {
       title: '角色名称',
       dataIndex: 'name',
-      width: 160,
+      width: 120,
       ellipsis: true,
     },
     {
@@ -130,14 +129,21 @@ const UserGroupManagement: React.FC = () => {
 
   return (
     <ContainerLayout title='后台角色管理' custom>
-      <div className='flex p-4'>
-        <div className={styles.left}>
-          <div className={styles.header}>
-            <div className={styles.title}>角色分组</div>
-            <Button size='small' type='primary' onClick={() => changeModelInfo()}>
-              新增分组
-            </Button>
-          </div>
+      <ColumnPanel
+        leftTitle='角色分组'
+        leftExtra={
+          <Button size='small' type='primary' onClick={() => changeModelInfo()}>
+            新增分组
+          </Button>
+        }
+        rightTitle='角色列表'
+        rightExtra={
+          <Button size='small' type='primary' onClick={() => changeModelInfo(null, RoleType.Item)}>
+            新增角色
+          </Button>
+        }
+      >
+        <div slot='left'>
           <div className={styles.choosed}>当前选中分组：{currentGroup?.name}</div>
           <Search placeholder='请输入分组名称' allowClear onSearch={setSearchGroup} />
           <div className={styles['left-content']} onMouseLeave={() => setCurrentHoverGroup(-1)}>
@@ -163,13 +169,7 @@ const UserGroupManagement: React.FC = () => {
             })}
           </div>
         </div>
-        <div className={styles.right}>
-          <div className={styles.header}>
-            <div className={styles.title}>角色列表</div>
-            <Button size='small' type='primary' onClick={() => changeModelInfo(null, RoleType.Item)}>
-              新增角色
-            </Button>
-          </div>
+        <div slot='right'>
           <ProTable
             className='mt-4'
             actionRef={actionRef}
@@ -188,10 +188,10 @@ const UserGroupManagement: React.FC = () => {
             request={fetchRoleList}
             manualRequest
             params={{ group: currentGroup }}
-            scroll={{ x: 700 }}
+            scroll={{ x: '100%' }}
           />
         </div>
-      </div>
+      </ColumnPanel>
       <EditRoleModal
         {...roleModalInfo}
         onConfirm={handleRoleModal}

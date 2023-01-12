@@ -8,17 +8,19 @@ import {
   ProFormText,
   ProFormTreeSelect,
 } from '@ant-design/pro-components';
+import { RoleListItem } from '@src/api/user-center/role/types';
 import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
 import { UserItem, UserStatusEnum } from '@src/api/user/types';
 import { Pattern } from '@src/utils/validate';
 import { useBoolean } from 'ahooks';
 import { Button, Form, message, TreeSelect } from 'antd';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
 
 interface IProps {
   open: boolean;
   data?: any;
   list: UserGroupItem[];
+  roleList: RoleListItem[];
   onSubmit: (v: UserItem) => Promise<void>;
   onClose: (v?: boolean) => void;
 }
@@ -36,7 +38,7 @@ const layout = {
 };
 
 const UserEdit = (props: IProps) => {
-  const { open, data, list, onClose, onSubmit } = props;
+  const { open, data, list, roleList = [], onClose, onSubmit } = props;
   const [form] = Form.useForm<UserItem>();
   const [isLoading, loadingFn] = useBoolean();
 
@@ -50,6 +52,7 @@ const UserEdit = (props: IProps) => {
         ...data,
       });
     }
+    console.log({ list, roleList });
   }, [open, data]);
 
   const onFinish = async (values: UserItem) => {
@@ -98,6 +101,24 @@ const UserEdit = (props: IProps) => {
           treeData: list,
           showCheckedStrategy: TreeSelect.SHOW_PARENT,
           placeholder: '请选择所属组织',
+        }}
+        labelCol={{ span: 4 }}
+        rules={[{ required: true }]}
+      />
+      <ProFormTreeSelect
+        required
+        label='所属角色'
+        name='roles'
+        fieldProps={{
+          fieldNames: {
+            label: 'name',
+            value: 'id',
+          },
+          treeData: roleList,
+          showCheckedStrategy: TreeSelect.SHOW_PARENT,
+          placeholder: '请选择所属角色',
+          treeCheckable: true,
+          treeDefaultExpandAll: true,
         }}
         labelCol={{ span: 4 }}
         rules={[{ required: true }]}

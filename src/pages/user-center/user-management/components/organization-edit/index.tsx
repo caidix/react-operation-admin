@@ -12,15 +12,6 @@ import { UserGroupItem } from '@src/api/user-center/user-group-management/types'
 import { useBoolean } from 'ahooks';
 import { Button, Form, message, TreeSelect } from 'antd';
 import { useEffect, useMemo } from 'react';
-
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
-
 interface IProps {
   open: boolean;
   data?: any;

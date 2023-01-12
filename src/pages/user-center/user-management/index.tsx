@@ -1,17 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Button, message, Tooltip, Space, Tree, Dropdown, Menu, Input, Table, Popconfirm } from 'antd';
+import { Button, message, Tooltip, Space, Tree, Dropdown, Menu, Input, Table, Popconfirm, SelectProps } from 'antd';
 import ContainerLayout from '@src/layout/ContentLayout';
 import { ProTable, ActionType, ProCard } from '@ant-design/pro-components';
-import {
-  SyncOutlined,
-  PlusOutlined,
-  EditOutlined,
-  DeleteOutlined,
-  ExclamationCircleOutlined,
-  SwapOutlined,
-} from '@ant-design/icons';
+import type { ProColumns, ProFormInstance } from '@ant-design/pro-components';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { AntTreeNode, DataNode } from 'antd/lib/tree';
 
-import { useBoolean, useSetState, useUpdateEffect } from 'ahooks';
+import { useBoolean, useSetState } from 'ahooks';
 import {
   batchTransferUsers,
   getAllOrganizationList,
@@ -19,21 +14,26 @@ import {
   postDeleteOrganization,
   postUpdateOrganization,
 } from '@src/api/user-center/user-group-management';
-import { requestExecute } from '@src/utils/request/utils';
-import { listToTree } from '@src/utils/format';
-import { AntTreeNode, DataNode } from 'antd/lib/tree';
-import { IDeleteOrganizationReq, UserGroupItem } from '@src/api/user-center/user-group-management/types';
-import { ActionCodeEnum, EMPTY_TABLE } from '@src/consts';
+import { getAllRoles } from '@src/api/user-center/role';
 import { getUserList, postCreateUser, postDeleteUser, postUpdateUser } from '@src/api/user';
 import { IGetUserListReq, UserItem } from '@src/api/user/types';
-import type { ProColumns, ProFormInstance } from '@ant-design/pro-components';
-import styles from './index.module.less';
+import { IDeleteOrganizationReq, UserGroupItem } from '@src/api/user-center/user-group-management/types';
+import { RoleListItem } from '@src/api/user-center/role/types';
+
+import { requestExecute } from '@src/utils/request/utils';
+import { listToTree } from '@src/utils/format';
+import { ActionCodeEnum, EMPTY_TABLE } from '@src/consts';
+
+import Split from '@src/components/Split';
 import OrganizationEdit from './components/organization-edit';
 import UserEdit from './components/user-edit';
 import BatchTransfer from './components/batch-transfer';
-import Split from '@src/components/Split';
+
+import styles from './index.module.less';
+import ColumnPanel from '@src/components/ColumnPanel';
 
 type UserTreeItem = DataNode & UserGroupItem;
+type RoleListNode = RoleListItem & DataNode & { key: string };
 
 const UserManagement: React.FC = () => {
   const [isOrgListLoading, isOrgListLoadingFn] = useBoolean();
@@ -60,7 +60,7 @@ const UserManagement: React.FC = () => {
     selected: null,
   });
   const [expandedKeys, setExpandedKeys] = useState<number[]>([]);
-
+  const [roleList, setRoleList] = useState<RoleListNode[]>([]);
   const changeOrgStatus = (open = false) => {
     setOrgInfo({ open, data: null });
   };
@@ -84,7 +84,31 @@ const UserManagement: React.FC = () => {
     setList({
       organizationList: data,
     });
-    console.log({ expandedKeys });
+  };
+
+  const fetchUserRoleList = async () => {
+    const [err, res] = await requestExecute(getAllRoles);
+    if (err) {
+      return;
+    }
+    const roleGroupKeys: any = {};
+    res.list.forEach((item) => {
+      const group = item.group;
+      if (!group) return;
+      if (!roleGroupKeys[group.id]) {
+        roleGroupKeys[group.id] = {
+          ...group,
+          checkable: false,
+          id: `none_${group.id}`,
+          children: [],
+        };
+      }
+      const children = roleGroupKeys[group.id]['children'];
+      children.push({
+        ...item,
+      });
+      setRoleList(Object.values(roleGroupKeys));
+    });
   };
 
   const handleUpdateOrganization = async (data: UserGroupItem) => {
@@ -183,6 +207,7 @@ const UserManagement: React.FC = () => {
 
   useEffect(() => {
     fetchOrganizationList();
+    fetchUserRoleList();
   }, []);
 
   const TreeNode = (data: UserTreeItem) => {
@@ -232,37 +257,42 @@ const UserManagement: React.FC = () => {
     {
       title: '用户名',
       width: 100,
-      key: 'name',
       dataIndex: 'name',
+      ellipsis: true,
     },
     {
       title: '昵称',
       dataIndex: 'nick',
-      key: 'nick',
+      width: 100,
+      ellipsis: true,
     },
     {
       title: '所属组织',
       dataIndex: 'orgName',
-      key: 'orgName',
+      width: 140,
+    },
+    {
+      title: '所属角色',
+      dataIndex: 'rolesName',
+      ellipsis: true,
+      width: 140,
     },
     {
       title: '创建时间',
       width: 140,
-      key: 'createTime',
       hideInSearch: true,
       dataIndex: 'createTime',
     },
     {
       title: '更新时间',
       width: 140,
-      key: 'updateTime',
       hideInSearch: true,
       dataIndex: 'updateTime',
     },
     {
       title: '操作',
       width: 140,
-      key: 'option',
+      fixed: 'right',
       valueType: 'option',
       render: (_: unknown, data: UserItem) => (
         <Split type='button'>
@@ -279,116 +309,117 @@ const UserManagement: React.FC = () => {
 
   return (
     <ContainerLayout custom>
-      <div className='m-4'>
-        <ProCard split='vertical'>
-          <ProCard
-            colSpan='240px'
-            title='组织管理'
-            headerBordered
-            className={styles['content-flex']}
-            extra={
-              <Space>
-                <Button type='primary' onClick={() => changeOrgStatus(true)} size='small'>
-                  新增
-                </Button>
-                <Button onClick={fetchOrganizationList} loading={isOrgListLoading} size='small'>
-                  刷新
-                </Button>
-              </Space>
-            }
-          >
-            <div className={styles.title}>当前选中组织：{list.selected?.name || '-'}</div>
-            <Tree<UserTreeItem>
-              fieldNames={{ key: 'id' }}
-              autoExpandParent
-              blockNode
-              showLine
-              height={650}
-              treeData={list.organizationList}
-              expandedKeys={expandedKeys}
-              selectedKeys={list.selectedKeys}
-              onSelect={handleTreeSelect}
-              titleRender={TreeNode}
-              onExpand={(keys) => setExpandedKeys(keys as number[])}
-            />
-          </ProCard>
-          <ProCard title='成员管理' headerBordered>
-            <ProTable
-              formRef={userTableRef}
-              columns={columns}
-              request={fetchUserList}
-              params={{
-                organization: list.selected?.id,
-              }}
-              search={{
-                labelWidth: 'auto',
-              }}
-              pagination={{
-                pageSize: 5,
-              }}
-              toolBarRender={() => [
-                <Button type='primary' onClick={() => changeUserStatus(true)}>
-                  新增
-                </Button>,
-              ]}
-              rowSelection={{
-                selectedRowKeys: batchInfo.data,
-                onChange(selectedRowKeys) {
-                  setBatchInfo({ data: selectedRowKeys });
-                },
-              }}
-              tableAlertRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => (
-                <span>已选 {selectedRowKeys.length} 项</span>
-              )}
-              tableAlertOptionRender={({ selectedRowKeys, onCleanSelected }) => {
-                return (
-                  <>
-                    <Button type='link' onClick={onCleanSelected}>
-                      取消选择
-                    </Button>
-                    <Button
-                      type='link'
-                      onClick={() => {
-                        setBatchInfo({
-                          open: true,
-                          data: selectedRowKeys,
-                        });
-                      }}
-                      loading={isOrgListLoading}
-                    >
-                      批量转移
-                    </Button>
-                    <Button type='link' onClick={() => handleDeleteUsers(selectedRowKeys)} loading={isOrgListLoading}>
-                      批量删除
-                    </Button>
-                  </>
-                );
-              }}
-              headerTitle='成员列表'
-              columnsState={{
-                persistenceKey: 'org-user-list',
-                persistenceType: 'localStorage',
-              }}
-              rowKey='id'
-              scroll={{ x: 700 }}
-            />
-          </ProCard>
-        </ProCard>
-
-        <OrganizationEdit
-          {...orgInfo}
-          list={list.organizationList}
-          onSubmit={handleUpdateOrganization}
-          onClose={changeOrgStatus}
-        />
-        <UserEdit {...userInfo} list={list.organizationList} onSubmit={handleUpdateUser} onClose={changeUserStatus} />
-        <BatchTransfer
-          open={batchInfo.open}
-          list={list.organizationList}
-          onSubmit={handleBatchTransferUsers}
-          onClose={changeBatchStatus}
-        />
-      </div>
+      <ColumnPanel
+        leftTitle='组织管理'
+        leftExtra={
+          <Space>
+            <Button type='primary' onClick={() => changeOrgStatus(true)} size='small'>
+              新增
+            </Button>
+            <Button onClick={fetchOrganizationList} loading={isOrgListLoading} size='small'>
+              刷新
+            </Button>
+          </Space>
+        }
+        rightTitle='成员管理'
+      >
+        <div slot='left'>
+          <div className={styles.title}>当前选中组织：{list.selected?.name || '-'}</div>
+          <Tree<UserTreeItem>
+            fieldNames={{ key: 'id' }}
+            autoExpandParent
+            blockNode
+            showLine
+            height={650}
+            treeData={list.organizationList}
+            expandedKeys={expandedKeys}
+            selectedKeys={list.selectedKeys}
+            onSelect={handleTreeSelect}
+            titleRender={TreeNode}
+            onExpand={(keys) => setExpandedKeys(keys as number[])}
+          />
+        </div>
+        <div slot='right'>
+          <ProTable
+            formRef={userTableRef}
+            columns={columns}
+            request={fetchUserList}
+            params={{
+              organization: list.selected?.id,
+            }}
+            search={{
+              labelWidth: 'auto',
+            }}
+            pagination={{
+              pageSize: 5,
+            }}
+            toolBarRender={() => [
+              <Button type='primary' onClick={() => changeUserStatus(true)}>
+                新增
+              </Button>,
+            ]}
+            rowSelection={{
+              selectedRowKeys: batchInfo.data,
+              onChange(selectedRowKeys) {
+                setBatchInfo({ data: selectedRowKeys });
+              },
+            }}
+            tableAlertRender={({ selectedRowKeys, selectedRows, onCleanSelected }) => (
+              <span>已选 {selectedRowKeys.length} 项</span>
+            )}
+            tableAlertOptionRender={({ selectedRowKeys, onCleanSelected }) => {
+              return (
+                <>
+                  <Button type='link' onClick={onCleanSelected}>
+                    取消选择
+                  </Button>
+                  <Button
+                    type='link'
+                    onClick={() => {
+                      setBatchInfo({
+                        open: true,
+                        data: selectedRowKeys,
+                      });
+                    }}
+                    loading={isOrgListLoading}
+                  >
+                    批量转移
+                  </Button>
+                  <Button type='link' onClick={() => handleDeleteUsers(selectedRowKeys)} loading={isOrgListLoading}>
+                    批量删除
+                  </Button>
+                </>
+              );
+            }}
+            headerTitle='成员列表'
+            columnsState={{
+              persistenceKey: 'org-user-list',
+              persistenceType: 'localStorage',
+            }}
+            rowKey='id'
+            scroll={{ x: 700 }}
+          />
+        </div>
+      </ColumnPanel>
+      <OrganizationEdit
+        {...orgInfo}
+        list={list.organizationList}
+        onSubmit={handleUpdateOrganization}
+        onClose={changeOrgStatus}
+      />
+      <UserEdit
+        {...userInfo}
+        list={list.organizationList}
+        roleList={roleList}
+        onSubmit={handleUpdateUser}
+        onClose={changeUserStatus}
+      />
+      <BatchTransfer
+        open={batchInfo.open}
+        list={list.organizationList}
+        onSubmit={handleBatchTransferUsers}
+        onClose={changeBatchStatus}
+      />
     </ContainerLayout>
   );
 };

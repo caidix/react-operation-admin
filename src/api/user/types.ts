@@ -7,6 +7,7 @@ export interface UserItem {
   phone?: string;
   isSuper?: boolean;
   verifyCode?: string;
+  roles?: number[];
   organization?: number;
 }
 
@@ -31,7 +32,13 @@ export interface IRegisterReq {
   verifyCode: string;
 }
 
-export type IGetUserListReq = Partial<UserItem> & IPagination;
+export type IGetUserListReq = Partial<
+  UserItem & {
+    orgName: string;
+    rolesName: string;
+  }
+> &
+  IPagination;
 
 export type IPostCreateUserReq = PartialByKeys<UserItem, 'id'>;
 
