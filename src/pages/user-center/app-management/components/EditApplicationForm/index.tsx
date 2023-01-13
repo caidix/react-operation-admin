@@ -37,7 +37,12 @@ const EditApplicationForm = forwardRef<IApplicationFormProps, IProps>((props, re
         <Input maxLength={64} placeholder='请输入应用名称' />
       </Form.Item>
       <Form.Item label='应用编码' rules={[{ required: true, message: '请输入应用编码' }]} name={ColumnEnum.Code}>
-        <Input maxLength={32} disabled={!!data.id} placeholder='请输入应用编码, 即微前端应用路由编码' onChange={handleAppCodeChange} />
+        <Input
+          maxLength={32}
+          disabled={!!data && data.id}
+          placeholder='请输入应用编码, 即微前端应用路由编码'
+          onChange={handleAppCodeChange}
+        />
       </Form.Item>
       <Form.Item
         label='访问地址'

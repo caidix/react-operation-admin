@@ -13,9 +13,9 @@ import { getApplicationList } from '@src/api/user-center/app-management/applicat
 import { useNavigate } from 'react-router-dom';
 import { RoutePath } from '@src/routes/config';
 import Split from '@src/components/Split';
+import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { baseActions, ColumnEnum, getColumns } from './config';
 import EditApplicationModal from './components/EditApplicationModal';
-import { ProColumns, ProTable } from '@ant-design/pro-components';
 
 const { Option } = Select;
 

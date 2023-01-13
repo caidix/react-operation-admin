@@ -44,3 +44,11 @@ export const postCreateRole = (data: IPostCreateRoleReq) => {
 export const postUpdateRole = (data: IPostUpdateRoleReq) => {
   return http.post('/role/update', data);
 };
+
+export const postMenuAuthList = (data: any) => {
+  return http.post('/role/menu-auth-list', data);
+};
+
+export const getSystemRoleAuth = (params: { roleId: number }) => {
+  return http.get('/role/role-auth-system', params);
+};
