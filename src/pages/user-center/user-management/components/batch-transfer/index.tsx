@@ -1,13 +1,5 @@
-import { PlusOutlined } from '@ant-design/icons';
-import {
-  ModalForm,
-  ProForm,
-  ProFormTextArea,
-  ProFormDigit,
-  ProFormRadio,
-  ProFormText,
-  ProFormTreeSelect,
-} from '@ant-design/pro-components';
+import React from 'react';
+import { ModalForm, ProFormTreeSelect } from '@ant-design/pro-components';
 import { UserGroupItem } from '@src/api/user-center/user-group-management/types';
 import { UserItem, UserStatusEnum } from '@src/api/user/types';
 import { Pattern } from '@src/utils/validate';

@@ -23,6 +23,12 @@ export interface RoleItem {
   group?: RoleGroupItem;
 }
 
+export interface RoleAuthItem {
+  id: number;
+  roleId: number;
+  systemId: number;
+}
+
 export type IPostCreateRoleGroupReq = Omit<RoleGroupItem, 'id'>;
 export type IPostUpdateRoleGroupReq = RoleGroupItem;
 
@@ -45,3 +51,16 @@ export type IGetAllRolesReq = Partial<RoleItem>;
 export interface IGetAllRolesResp {
   list: RoleListItem[];
 }
+
+export interface IUpdateSystemRoleAuthReq {
+  roleId: number;
+  systemIds: number[];
+  type?: number;
+}
+
+export interface IGetSystemRoleAuthReq {
+  roleId: number;
+}
+export type IGetSystemRoleAuthResp = (RoleAuthItem & {
+  systemName: string;
+})[];

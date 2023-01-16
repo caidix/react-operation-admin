@@ -5,10 +5,13 @@ import {
   IGetAllRolesResp,
   IGetRoleListReq,
   IGetRoleListResp,
+  IGetSystemRoleAuthReq,
+  IGetSystemRoleAuthResp,
   IPostCreateRoleGroupReq,
   IPostCreateRoleReq,
   IPostUpdateRoleGroupReq,
   IPostUpdateRoleReq,
+  IUpdateSystemRoleAuthReq,
 } from './types';
 
 /**
@@ -49,6 +52,10 @@ export const postMenuAuthList = (data: any) => {
   return http.post('/role/menu-auth-list', data);
 };
 
-export const getSystemRoleAuth = (params: { roleId: number }) => {
-  return http.get('/role/role-auth-system', params);
+export const getSystemRoleAuth = (params: IGetSystemRoleAuthReq) => {
+  return http.get<IGetSystemRoleAuthResp>('/role/role-auth-system', params);
+};
+
+export const updateSystemRoleAuth = (data: IUpdateSystemRoleAuthReq) => {
+  return http.post('/role/update-auth-system', data);
 };

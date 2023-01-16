@@ -1,14 +1,15 @@
 import { getAllApplicationList } from '@src/api/user-center/app-management';
 import { ApplicationItem } from '@src/api/user-center/app-management/application/types';
-import { getAllRoles, getSystemRoleAuth, postMenuAuthList } from '@src/api/user-center/role';
-import { IGetAllRolesResp, RoleListItem } from '@src/api/user-center/role/types';
+import { getAllRoles, getSystemRoleAuth, postMenuAuthList, updateSystemRoleAuth } from '@src/api/user-center/role';
+import { IGetAllRolesResp, IGetSystemRoleAuthResp, RoleListItem } from '@src/api/user-center/role/types';
 import ColumnPanel from '@src/components/ColumnPanel';
 import ContainerLayout from '@src/layout/ContentLayout';
 import { requestExecute } from '@src/utils/request/utils';
 import { useBoolean, useRequest, useSetState, useUpdateEffect } from 'ahooks';
-import { Spin, Space, Tabs, Typography, Button, Empty, Checkbox, Row, Col, Input, Tree, Table } from 'antd';
+import { Spin, Space, Tabs, Typography, Button, Empty, Checkbox, Row, Col, Input, Tree, Table, message } from 'antd';
 import { DataNode } from 'antd/lib/tree';
 import React, { useEffect, useMemo, useState } from 'react';
+import classnames from 'classnames';
 import EditAppModal from './components/EditAppDialog';
 import styles from './index.module.less';
 
@@ -39,8 +40,8 @@ const AuthManagement = () => {
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
   const [expandedRowKeys, setExpandedRowKeys] = useState<any[]>();
   const [activeTabKey, setActiveTabKey] = useState('');
-  const [systemList, setSystemList] = useSetState<{
-    list: any[];
+  const [roleAuth, setRoleAuth] = useSetState<{
+    list: IGetSystemRoleAuthResp;
     checked: number;
   }>({ list: [], checked: -1 });
 
@@ -104,15 +105,20 @@ const AuthManagement = () => {
     if (err) {
       return;
     }
+
+    let checked = roleAuth.checked;
+    const hasAuth = res.find((auth) => auth.systemId === checked);
+    if (!hasAuth) {
+      checked = res.length ? res[0].systemId : -1;
+    }
+
+    setRoleAuth({ list: res, checked });
     setLoading({ system: false });
-    // const list = res.list.map((item) => ({ ...item, label: item.name, value: item.id }));
-    // setSystemList({ list: res.list });
-    console.log({ res });
   };
 
   const fetchSystemMenus = async (id: number) => {
-    const system = systemList.list.find((i) => i.id === +id);
-    console.log({ system: systemList.list, id });
+    const system = roleAuth.list.find((i) => i.id === +id);
+    console.log({ system: roleAuth.list, id });
 
     if (!system) return;
     const [err, res] = await requestExecute(postMenuAuthList, {
@@ -123,7 +129,19 @@ const AuthManagement = () => {
     if (err) {
       return;
     }
-    console.log({ res });
+  };
+
+  const handleSystemAuth = async (systemIds: number[]) => {
+    const [err, res] = await requestExecute(updateSystemRoleAuth, {
+      systemIds,
+      roleId: roleList.selected.id,
+    });
+    if (err) {
+      return;
+    }
+    message.success('配置成功');
+    setAppModalShow.setFalse();
+    getAuthSystemList();
   };
 
   const handleSearchRole = (search: string) => {
@@ -144,11 +162,6 @@ const AuthManagement = () => {
   };
 
   const handleSave = () => {};
-
-  const onChangeTabs = (i) => {
-    console.log('changes', i);
-    fetchSystemMenus(i);
-  };
 
   useEffect(() => {
     fetchData();
@@ -187,13 +200,33 @@ const AuthManagement = () => {
         </div>
         <div slot='right' className='mt-2'>
           <Spin spinning={loadingEnum.system}>
-            <div className={styles['checked-panel']}>{}</div>
+            <div className={styles['checked-panel']}>
+              <Row gutter={[16, 16]}>
+                {roleAuth.list.map((auth) => (
+                  <Col
+                    xs={24}
+                    sm={12}
+                    md={6}
+                    lg={3}
+                    onClick={() => setRoleAuth({ checked: auth.systemId })}
+                    className={classnames([
+                      'single-ellipsis',
+                      styles['system-item'],
+                      roleAuth.checked === auth.systemId ? styles['system-item--active'] : '',
+                    ])}
+                    key={auth.id}
+                  >
+                    {auth.systemName}
+                  </Col>
+                ))}
+              </Row>
+            </div>
             {/* 菜单权限 */}
             <Space size={30}>
               <div className={styles.title}>请选择菜单和功能点</div>
               <div className={styles.tips}>提示：勾选【菜单和功能点】表示 属于该角色的用户可以访问操作该权限点</div>
             </Space>
-            {systemList.list
+            {/* {systemList.list
               .filter((i) => i.id && systemList.checked.includes(i.id))
               .map((item) => (
                 <Table
@@ -210,11 +243,16 @@ const AuthManagement = () => {
                     },
                   }}
                 />
-              ))}
+              ))} */}
           </Spin>
         </div>
       </ColumnPanel>
-      <EditAppModal visible={appModalShow} systemList={systemList.list} onClose={setAppModalShow.setFalse} />
+      <EditAppModal
+        visible={appModalShow}
+        authList={roleAuth.list}
+        onClose={setAppModalShow.setFalse}
+        onConfirm={handleSystemAuth}
+      />
     </ContainerLayout>
   );
 };

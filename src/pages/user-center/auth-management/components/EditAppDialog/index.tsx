@@ -1,45 +1,26 @@
 import React, { useMemo, useEffect, useState } from 'react';
 import { Modal, Input, Form, Radio, message, Space, Checkbox, Col, Row, Spin, Empty } from 'antd';
-import useForm from '@src/hooks/use-form';
-import { requestExecute } from '@src/utils/request/utils';
-import { postCreateOrganization, postUpdateOrganization } from '@src/api/user-center/user-group-management';
-import { Pattern } from '@src/utils/validate';
-import { ModalForm, ProFormCheckbox, ProFormSelect, ProFormText, ProFormTextArea } from '@ant-design/pro-components';
-import { postCreateRole, postCreateRoleGroup, postUpdateRole, postUpdateRoleGroup } from '@src/api/user-center/role';
-import { RoleGroupItem } from '@src/api/user-center/role/types';
-import { ColumnEnum } from '../../config';
-import { RoleParams, RoleType } from '../../types';
-import { ApplicationItem } from '@src/api/user-center/app-management/application/types';
 
-import styles from '../../index.module.less';
 import { useRequest } from 'ahooks';
 import { getAllApplicationList } from '@src/api/user-center/app-management';
 import { CheckboxValueType } from 'antd/lib/checkbox/Group';
+import styles from '../../index.module.less';
+
 interface IProps {
   visible: boolean;
-  systemList: ApplicationItem[];
-  onConfirm?: () => void;
+  authList: { systemId: number }[];
+  onConfirm?: (v: number[]) => Promise<void>;
   onClose?: () => void;
-  checked?: number[];
 }
 
 const EditAppModal: React.FC<IProps> = (props) => {
-  const { visible, systemList, checked = [], onClose, onConfirm } = props;
+  const { visible, authList, onClose, onConfirm } = props;
   const [isLoading, setIsLoading] = useState(false);
   const [checkedKey, setCheckedKey] = useState<Array<CheckboxValueType>>([]);
   const handleConfirm = async () => {
     try {
       setIsLoading(true);
-      // const [err] = await requestExecute(request, {
-      //   ...data,
-      //   ...values,
-      // });
-      // if (err) {
-      //   return;
-      // }
-      message.success('配置成功');
-      onConfirm?.();
-      onClose?.();
+      await onConfirm?.(checkedKey.map((i) => +i));
     } finally {
       setIsLoading(false);
     }
@@ -51,18 +32,26 @@ const EditAppModal: React.FC<IProps> = (props) => {
   });
 
   const init = () => {
-    run();
+    const checked = authList.map((i) => +i.systemId);
     setCheckedKey(checked);
   };
 
   useEffect(() => {
     if (visible) {
+      run();
       init();
     }
   }, [visible]);
 
   return (
-    <Modal title='授权应用设置' width={600} confirmLoading={isLoading} onOk={handleConfirm} open={visible} onCancel={onClose}>
+    <Modal
+      title='授权应用设置'
+      width={600}
+      confirmLoading={isLoading}
+      onOk={handleConfirm}
+      open={visible}
+      onCancel={onClose}
+    >
       <Spin spinning={loading}>
         <Space size={30}>
           <div className={styles.title}>请选择应用</div>
