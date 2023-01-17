@@ -239,8 +239,8 @@ const AuthManagement = () => {
         }
       >
         <div slot='left' className={styles.panel}>
-          <div className={styles.choosed}>当前选中角色：{}</div>
-          <Search placeholder='请输入分组名称' allowClear onSearch={handleSearchRole} />
+          <div className='mt-2'>当前选中角色：{roleList.selected?.name}</div>
+          <Search className='mt-2 mb-2' placeholder='请输入分组名称' allowClear onSearch={handleSearchRole} />
 
           <Tree
             blockNode
