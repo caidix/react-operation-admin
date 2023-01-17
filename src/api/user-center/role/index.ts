@@ -9,8 +9,11 @@ import {
   IGetSystemRoleAuthResp,
   IPostCreateRoleGroupReq,
   IPostCreateRoleReq,
+  IPostMenuAuthListReq,
+  IPostMenuAuthListResp,
   IPostUpdateRoleGroupReq,
   IPostUpdateRoleReq,
+  IUpdateMenuRoleAuthReq,
   IUpdateSystemRoleAuthReq,
 } from './types';
 
@@ -48,8 +51,8 @@ export const postUpdateRole = (data: IPostUpdateRoleReq) => {
   return http.post('/role/update', data);
 };
 
-export const postMenuAuthList = (data: any) => {
-  return http.post('/role/menu-auth-list', data);
+export const postMenuAuthList = (data: IPostMenuAuthListReq) => {
+  return http.post<IPostMenuAuthListResp>('/role/menu-auth-list', data);
 };
 
 export const getSystemRoleAuth = (params: IGetSystemRoleAuthReq) => {
@@ -58,4 +61,8 @@ export const getSystemRoleAuth = (params: IGetSystemRoleAuthReq) => {
 
 export const updateSystemRoleAuth = (data: IUpdateSystemRoleAuthReq) => {
   return http.post('/role/update-auth-system', data);
+};
+
+export const updateMenuRoleAuth = (data: IUpdateMenuRoleAuthReq) => {
+  return http.post('/role/update-auth-menus', data);
 };

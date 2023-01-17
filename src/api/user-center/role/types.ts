@@ -1,3 +1,5 @@
+import { MenuItem } from '../app-management/menus/types';
+
 export interface UserGroupItem {
   id: number;
   name: string;
@@ -58,9 +60,28 @@ export interface IUpdateSystemRoleAuthReq {
   type?: number;
 }
 
+export interface IUpdateMenuRoleAuthReq {
+  roleId: number;
+  systemId: number;
+  menuIds: number[];
+  type?: number;
+}
+
 export interface IGetSystemRoleAuthReq {
   roleId: number;
 }
 export type IGetSystemRoleAuthResp = (RoleAuthItem & {
   systemName: string;
+  systemCode: string;
 })[];
+
+export interface IPostMenuAuthListReq {
+  systemCode: string;
+  systemId: number;
+  roleId: number;
+}
+
+export interface IPostMenuAuthListResp {
+  list: MenuItem[];
+  auths: number[];
+}

@@ -1,25 +1,37 @@
-import { getAllApplicationList } from '@src/api/user-center/app-management';
-import { ApplicationItem } from '@src/api/user-center/app-management/application/types';
-import { getAllRoles, getSystemRoleAuth, postMenuAuthList, updateSystemRoleAuth } from '@src/api/user-center/role';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import classnames from 'classnames';
+import { useBoolean, useSetState, useUpdateEffect } from 'ahooks';
+import { Spin, Space, Button, Empty, Row, Col, Input, Tree, message } from 'antd';
+
+import {
+  getAllRoles,
+  getSystemRoleAuth,
+  postMenuAuthList,
+  updateMenuRoleAuth,
+  updateSystemRoleAuth,
+} from '@src/api/user-center/role';
 import { IGetAllRolesResp, IGetSystemRoleAuthResp, RoleListItem } from '@src/api/user-center/role/types';
+import { DataNode } from 'antd/lib/tree';
+
 import ColumnPanel from '@src/components/ColumnPanel';
 import ContainerLayout from '@src/layout/ContentLayout';
 import { requestExecute } from '@src/utils/request/utils';
-import { useBoolean, useRequest, useSetState, useUpdateEffect } from 'ahooks';
-import { Spin, Space, Tabs, Typography, Button, Empty, Checkbox, Row, Col, Input, Tree, Table, message } from 'antd';
-import { DataNode } from 'antd/lib/tree';
-import React, { useEffect, useMemo, useState } from 'react';
-import classnames from 'classnames';
+import { listToTree } from '@src/utils/format';
 import EditAppModal from './components/EditAppDialog';
+
 import styles from './index.module.less';
 
-const { TabPane } = Tabs;
-const { Title } = Typography;
 const { Search } = Input;
 
 type FilterListNode = RoleListItem & DataNode & { key: string };
 
 const AuthManagement = () => {
+  const [loadingEnum, setLoading] = useSetState({
+    system: false,
+    role: false,
+  });
+
+  /** 角色列表操作 -- start */
   const [searchRole, setSearchRole] = useState('');
   const [roleList, setRoleList] = useSetState<{
     list: IGetAllRolesResp['list'];
@@ -32,30 +44,8 @@ const AuthManagement = () => {
     selectedKeys: [],
     selected: null,
   });
-  const [appModalInfo, setModalInfo] = useSetState<any>({
-    visible: false,
-    data: null,
-  });
-  const [appModalShow, setAppModalShow] = useBoolean();
+
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
-  const [expandedRowKeys, setExpandedRowKeys] = useState<any[]>();
-  const [activeTabKey, setActiveTabKey] = useState('');
-  const [roleAuth, setRoleAuth] = useSetState<{
-    list: IGetSystemRoleAuthResp;
-    checked: number;
-  }>({ list: [], checked: -1 });
-
-  const [tableTreeState, setTableTreeState] = useSetState({
-    menuList: [],
-    checkedList: [],
-  });
-
-  const [loadingEnum, setLoading] = useSetState({
-    system: false,
-    table: false,
-    role: false,
-  });
-
   const formatRoles = (list: IGetAllRolesResp['list'], search = searchRole): void => {
     const roleGroupKeys: any = {};
     list.forEach((item) => {
@@ -89,16 +79,41 @@ const AuthManagement = () => {
     setRoleList({ filterList, list: list, selected, selectedKeys });
   };
 
-  const fetchData = async () => {
+  const fetchRoleList = async () => {
     const [err, res] = await requestExecute(getAllRoles, {});
     if (!err && res?.list) {
       formatRoles(res.list);
     }
   };
 
+  const handleSearchRole = (search: string) => {
+    setSearchRole(search);
+    formatRoles(roleList.list, search);
+  };
+
+  const handleRoleSelect = (value: Array<string | number>, info: any) => {
+    if (!value.length) {
+      return;
+    }
+    const node = info.node;
+    setRoleList({
+      selectedKeys: [node.key],
+      selected: node,
+    });
+  };
+  /** 角色列表操作 -- end */
+
+  /** 当前角色所拥有的应用权限操作 -- start */
+  const [appModalShow, setAppModalShow] = useBoolean();
+  const [roleAuth, setRoleAuth] = useSetState<{
+    list: IGetSystemRoleAuthResp;
+    checked: number | null;
+  }>({ list: [], checked: null });
+
   const getAuthSystemList = async () => {
     if (!roleList.selected.id) return;
     setLoading({ system: true });
+    setRoleAuth({ list: [], checked: null });
     const [err, res] = await requestExecute(getSystemRoleAuth, {
       roleId: roleList.selected.id,
     });
@@ -109,26 +124,11 @@ const AuthManagement = () => {
     let checked = roleAuth.checked;
     const hasAuth = res.find((auth) => auth.systemId === checked);
     if (!hasAuth) {
-      checked = res.length ? res[0].systemId : -1;
+      checked = res.length ? res[0].systemId : null;
     }
 
     setRoleAuth({ list: res, checked });
     setLoading({ system: false });
-  };
-
-  const fetchSystemMenus = async (id: number) => {
-    const system = roleAuth.list.find((i) => i.id === +id);
-    console.log({ system: roleAuth.list, id });
-
-    if (!system) return;
-    const [err, res] = await requestExecute(postMenuAuthList, {
-      systemId: system.id,
-      code: system.code,
-      roleId: roleList.selected.id,
-    });
-    if (err) {
-      return;
-    }
   };
 
   const handleSystemAuth = async (systemIds: number[]) => {
@@ -144,34 +144,88 @@ const AuthManagement = () => {
     getAuthSystemList();
   };
 
-  const handleSearchRole = (search: string) => {
-    setSearchRole(search);
-    formatRoles(roleList.list, search);
-  };
+  /** 当前角色所拥有的应用权限操作 -- end */
 
-  const handleTreeSelect = (value: Array<string | number>, info: any) => {
-    if (!value.length) {
+  /** 获取当前应用的菜单及权限操作 -- start */
+  const [expandedRowKeys, setExpandedRowKeys] = useState<any[]>();
+  const [menus, setMenus] = useSetState<{ menuList: any; checkedKeys: React.Key[] }>({
+    menuList: [],
+    checkedKeys: [],
+  });
+  const treeRef = useRef<any>();
+
+  const fetchSystemMenus = async () => {
+    setLoading({ role: true });
+    const system = roleAuth.list.find((i) => i.systemId === roleAuth.checked);
+    if (!system) return;
+    const [err, res] = await requestExecute(postMenuAuthList, {
+      systemId: system.systemId,
+      systemCode: system.systemCode,
+      roleId: roleList.selected.id,
+    });
+    if (err) {
       return;
     }
-    const node = info.node;
-
-    setRoleList({
-      selectedKeys: [node.key],
-      selected: node,
-    });
+    const list = listToTree(res.list, 'id', 'parentId', 'children');
+    const checkedKeys = getCheckedKeys(res.auths, list);
+    setExpandedRowKeys(res.list.map((v: { id: any }) => v.id));
+    setMenus({ menuList: list, checkedKeys });
+    setLoading({ role: false });
   };
 
-  const handleSave = () => {};
+  const handleSaveMenuAuth = async () => {
+    try {
+      setLoading({ role: true });
+      if (!roleAuth.checked || !roleList.selected.id) {
+        return message.error('请先选择角色/应用后进行操作');
+      }
+      const halfCheckedKeys = treeRef.current?.state.halfCheckedKeys || [];
+      const menuIds = [...menus.checkedKeys, ...halfCheckedKeys];
+      const [err, res] = await requestExecute(updateMenuRoleAuth, {
+        menuIds,
+        systemId: roleAuth.checked,
+        roleId: roleList.selected.id,
+      });
+      if (err) {
+        return;
+      }
+      message.success('更新权限配置成功');
+    } finally {
+      setLoading({ role: false });
+    }
+  };
+
+  const onCheckMenus = (checkedKeysValue: React.Key[]) => {
+    setMenus({ checkedKeys: checkedKeysValue });
+  };
+
+  const getCheckedKeys = (checkedList: React.Key[], options: any[], total = []) => {
+    return options.reduce<number[]>((prev, curr) => {
+      if (curr.children?.length) {
+        getCheckedKeys(checkedList, curr.children, total);
+      } else {
+        if (checkedList.includes(curr.id)) {
+          prev.push(curr.id);
+        }
+      }
+      return prev;
+    }, total);
+  };
+  /** 获取当前应用的菜单及权限操作 -- end */
 
   useEffect(() => {
-    fetchData();
+    fetchRoleList();
   }, []);
 
   useUpdateEffect(() => {
     getAuthSystemList();
   }, [roleList.selected]);
 
-  const columns = [];
+  useUpdateEffect(() => {
+    if (roleAuth.checked) {
+      fetchSystemMenus();
+    }
+  }, [roleAuth.checked]);
 
   return (
     <ContainerLayout title='后台权限管理' custom>
@@ -195,56 +249,74 @@ const AuthManagement = () => {
             selectedKeys={roleList.selectedKeys}
             expandedKeys={expandedKeys}
             onExpand={(keys) => setExpandedKeys(keys as string[])}
-            onSelect={handleTreeSelect}
+            onSelect={handleRoleSelect}
           />
         </div>
         <div slot='right' className='mt-2'>
           <Spin spinning={loadingEnum.system}>
             <div className={styles['checked-panel']}>
-              <Row gutter={[16, 16]}>
-                {roleAuth.list.map((auth) => (
-                  <Col
-                    xs={24}
-                    sm={12}
-                    md={6}
-                    lg={3}
-                    onClick={() => setRoleAuth({ checked: auth.systemId })}
-                    className={classnames([
-                      'single-ellipsis',
-                      styles['system-item'],
-                      roleAuth.checked === auth.systemId ? styles['system-item--active'] : '',
-                    ])}
-                    key={auth.id}
-                  >
-                    {auth.systemName}
-                  </Col>
-                ))}
-              </Row>
+              {roleAuth.list.length ? (
+                <Row gutter={[16, 16]}>
+                  {roleAuth.list.map((auth) => (
+                    <Col
+                      xs={24}
+                      sm={12}
+                      md={6}
+                      lg={4}
+                      onClick={() => setRoleAuth({ checked: auth.systemId })}
+                      className={classnames([
+                        'single-ellipsis',
+                        styles['system-item'],
+                        roleAuth.checked === auth.systemId ? styles['system-item--active'] : '',
+                      ])}
+                      key={auth.id}
+                    >
+                      {auth.systemName}
+                    </Col>
+                  ))}
+                </Row>
+              ) : (
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description='暂无相关应用权限，请授权' />
+              )}
             </div>
-            {/* 菜单权限 */}
-            <Space size={30}>
-              <div className={styles.title}>请选择菜单和功能点</div>
-              <div className={styles.tips}>提示：勾选【菜单和功能点】表示 属于该角色的用户可以访问操作该权限点</div>
-            </Space>
-            {/* {systemList.list
-              .filter((i) => i.id && systemList.checked.includes(i.id))
-              .map((item) => (
-                <Table
-                  key={item.id}
-                  loading={loadingEnum.table}
-                  dataSource={[] as any}
-                  columns={columns}
-                  showHeader={false}
-                  pagination={false}
-                  expandable={{
-                    expandedRowKeys: expandedRowKeys,
-                    onExpandedRowsChange: (expandedRows: any) => {
-                      setExpandedRowKeys(expandedRows);
-                    },
-                  }}
-                />
-              ))} */}
           </Spin>
+          {/* 菜单权限 */}
+          {roleAuth.checked ? (
+            <>
+              <Spin spinning={loadingEnum.role}>
+                <Space size={30} className='mt-4 mb-4'>
+                  <div className={styles.title}>请选择菜单和功能点</div>
+                  <div className={styles.tips}>提示：勾选【菜单和功能点】表示 属于该角色的用户可以访问操作该权限点</div>
+                </Space>
+                {menus.menuList.length ? (
+                  <>
+                    <div className={styles['checked-panel']}>
+                      <Tree
+                        ref={treeRef}
+                        checkable
+                        onExpand={setExpandedRowKeys}
+                        expandedKeys={expandedRowKeys}
+                        onCheck={onCheckMenus as any}
+                        checkedKeys={menus.checkedKeys}
+                        treeData={menus.menuList}
+                        fieldNames={{ title: 'name', key: 'id' }}
+                      />
+                    </div>
+                    <div className={styles.submit}>
+                      <Button type='primary' loading={loadingEnum.role} onClick={handleSaveMenuAuth}>
+                        保存
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <Empty
+                    image={Empty.PRESENTED_IMAGE_SIMPLE}
+                    description='该应用暂无菜单权限，请通过应用管理进行配置'
+                  />
+                )}
+              </Spin>
+            </>
+          ) : null}
         </div>
       </ColumnPanel>
       <EditAppModal

@@ -60,9 +60,9 @@ const EditAppModal: React.FC<IProps> = (props) => {
         {data?.list.length === 0 && <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}
         <div className={styles.model}>
           <Checkbox.Group value={checkedKey} onChange={(v) => setCheckedKey(v)}>
-            <Row>
+            <Row gutter={10}>
               {data?.list.map((item) => (
-                <Col key={item.id} lg={4} xxl={3} className={styles['grid-item']}>
+                <Col key={item.id} span={6} className={styles['grid-item']}>
                   <Checkbox value={item.id}>{item.name}</Checkbox>
                 </Col>
               ))}
