@@ -38,6 +38,11 @@ export const routes: IRouteConfig[] = [
       { path: RoutePath.USER_ROLE_MANAGEMENT, element: <RoleManagement />, meta: { name: '角色管理' } },
       { path: RoutePath.USER_ApplicationEdit, element: <UserAppEdit />, meta: { name: '应用编辑' } },
       { path: RoutePath.USER_AUTH_MANAGEMENT, element: <AuthManagement />, meta: { name: '权限管理' } },
+      // 微前端占位, 防止出现404
+      {
+        path: `${RoutePath.ALL}`,
+        element: <div />,
+      },
     ],
   },
   { path: RoutePath.LOGIN, meta: { auth: false, name: '登录' }, element: <Login /> },

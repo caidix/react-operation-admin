@@ -6,7 +6,7 @@ import useAntdTable from '@src/hooks/use-antd-table';
 import ColumnSetting, { ColumnSettingProps } from '@src/components/ColumnsFilter/Filter';
 import CustomTable from '@src/components/CustomTable';
 import { requestExecute } from '@src/utils/request/utils';
-import { ActionCodeEnum, EMPTY_OPTION, EMPTY_TABLE } from '@src/consts';
+import { ActionCodeEnum, EMPTY_OPTION, EMPTY_TABLE, PlatformConsts } from '@src/consts';
 import { ApplicationItem } from '@src/api/user-center/app-management/application/types';
 import { getApplicationList } from '@src/api/user-center/app-management/application';
 
@@ -16,6 +16,7 @@ import Split from '@src/components/Split';
 import { ProColumns, ProTable } from '@ant-design/pro-components';
 import { baseActions, ColumnEnum, getColumns } from './config';
 import EditApplicationModal from './components/EditApplicationModal';
+import router from '@src/router';
 
 const { Option } = Select;
 
@@ -48,11 +49,24 @@ const ApplicationManagement: React.FC = () => {
   const { submit, reset, reload } = search;
 
   /** 基础编辑操作 */
-  function handleBaseActions(record: ApplicationItem, code: ActionCodeEnum) {
+  const handleBaseActions = (record: ApplicationItem, code: ActionCodeEnum) => {
     if (code === ActionCodeEnum.Update) {
       navigate(`/${RoutePath.USER_ApplicationEdit}?code=${record.code}`, { replace: true });
     }
-  }
+  };
+
+  const handleLink = async (item: ApplicationItem) => {
+    if (item.code === PlatformConsts.APP_PLATFORM_CODE) {
+      return router.push(RoutePath.HOME_PAGE);
+    }
+
+    const path = `${PlatformConsts.MICRO_APP_ACTIVE_RULE_PREFIX}/${item.code}/`;
+    return router.push(path);
+
+    // 申请token
+
+    router.navigate(path, {}, true);
+  };
 
   const columns: ProColumns<ApplicationItem>[] = [
     {
@@ -60,7 +74,9 @@ const ApplicationManagement: React.FC = () => {
       dataIndex: ColumnEnum.Name,
       key: ColumnEnum.Name,
       width: 160,
-      ellipsis: true,
+      render: (name: string, record: ApplicationItem) => {
+        return <div onClick={() => handleLink(record)}>{name}123</div>;
+      },
     },
     {
       title: '应用编码',
@@ -160,6 +176,8 @@ const ApplicationManagement: React.FC = () => {
             新增应用
           </Button>,
         ]}
+        rowKey='id'
+        search={false}
         scroll={{ x: 1500 }}
         {...tableProps}
         columns={columns}

@@ -1,4 +1,4 @@
-import { Layout, Menu, Spin } from 'antd';
+import { Layout, Menu, message, Spin } from 'antd';
 import React, { FC, useEffect, useMemo } from 'react';
 import { DesktopOutlined, FileOutlined, PieChartOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
@@ -15,11 +15,19 @@ import { setLogin, setLogout } from '@src/store/user';
 import { getUserInfo } from '@src/api/user';
 import { PlatformConsts } from '@src/consts';
 import { setCollapsed } from '@src/store/setting';
+
+import { addGlobalUncaughtErrorHandler, removeGlobalUncaughtErrorHandler } from 'qiankun';
+
+import eventBus from '@src/utils/eventBus';
+import { initMicroApp } from '../../utils/micro-app/index';
 import Brand from './components/Brand';
 import Actions from './components/Actions';
+import LayoutMenu from './components/Menu';
 
 import styles from './index.module.less';
-import LayoutMenu from './components/Menu';
+import { getMicroActivePath } from './utils';
+import { requestExecute } from '@src/utils/request/utils';
+import { getApplicationDetail } from '@src/api/user-center/app-management';
 
 const { Header, Sider, Content } = Layout;
 
@@ -38,16 +46,9 @@ function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode,
   } as MenuItem;
 }
 
-const items: MenuItem[] = [
-  getItem('Option 1', '1', <PieChartOutlined />),
-  getItem('Option 2', '2', <DesktopOutlined />),
-  getItem('User', 'sub1', <UserOutlined />, [getItem('Tom', '3'), getItem('Bill', '4'), getItem('Alex', '5')]),
-  getItem('Team', 'sub2', <TeamOutlined />, [getItem('Team 1', '6'), getItem('Team 2', '8')]),
-  getItem('Files', '9', <FileOutlined />),
-];
-
 const PageLayout: FC = (props: IProps) => {
   const { setting, user } = useSelector((state: RootState) => state);
+
   async function validateUser() {
     const sessionId = getCookie('sessionId');
     if (!user.isLogin) {
@@ -64,15 +65,70 @@ const PageLayout: FC = (props: IProps) => {
           sessionId,
         }),
       );
+      // loadMicro(
+      //   {
+      //     isDelete: 0,
+      //     createTime: '2023-01-16 16:28:37',
+      //     updateTime: '2023-01-17 20:40:47',
+      //     deleteTime: '',
+      //     creator: 1,
+      //     operator: 1,
+      //     id: 1,
+      //     name: '测试应用',
+      //     desc: '',
+      //     appSecret: '',
+      //     resourcesUrl: 'http://localhost:9529/user/micro/test-code/',
+      //     url: 'http://localhost:9528/user/micro/TEST_CODE/',
+      //     logoUrl: '',
+      //     code: 'TEST_CODE',
+      //   },
+      //   {
+      //     user: res,
+      //     sessionId,
+      //   },
+      // );
     }
   }
 
-  function handleSettingCollapse(value: boolean) {
-    console.log('执行了', value);
-    store.dispatch(setCollapsed(value));
-  }
+  /**
+   * 初始化主应用
+   * @returns
+   */
+  const initPlatform = async () => {
+    const [err, res] = await requestExecute(getApplicationDetail, {
+      code: PlatformConsts.APP_PLATFORM_CODE,
+    });
+    if (err) return;
+    document.title = res.name;
+  };
 
   // function renderMenus() {}
+
+  const loadMicro = (appBase: any, intState: any) => {
+    let entry;
+    const SLASH = '/';
+    if (appBase.resourcesUrl?.startsWith('http')) {
+      entry = appBase.resourcesUrl;
+    } else {
+      entry = appBase.resourcesUrl?.startsWith(SLASH) ? appBase.resourcesUrl : `/${appBase.resourcesUrl}`;
+    }
+    if (entry === '' || entry === SLASH) {
+      return void message.error('载入地址无效');
+    }
+
+    const activeRule = getMicroActivePath(appBase.code);
+    console.log({ entry, appBase, activeRule });
+    const appConfig = {
+      name: appBase.name,
+      entry,
+      props: { ...intState, eventBus },
+    };
+    initMicroApp(appConfig, activeRule);
+  };
+
+  function handleSettingCollapse(value: boolean) {
+    store.dispatch(setCollapsed(value));
+  }
 
   const collapsed = useMemo(() => {
     console.log({ set: setting.collapsed });
@@ -81,6 +137,7 @@ const PageLayout: FC = (props: IProps) => {
 
   useEffect(() => {
     validateUser();
+    initPlatform();
   }, []);
 
   useEffect(() => {

@@ -36,7 +36,7 @@ export interface Emitter {
  * @name eventBus
  * @returns {eventBus}
  */
-export default function eventBus(all?: EventHandlerMap): Emitter {
+export default function EventBus(all?: EventHandlerMap): Emitter {
   all = all || new Map();
 
   return {
@@ -99,3 +99,5 @@ export default function eventBus(all?: EventHandlerMap): Emitter {
     },
   };
 }
+
+export const eventBus = EventBus();

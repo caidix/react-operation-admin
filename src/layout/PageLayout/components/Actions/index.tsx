@@ -49,7 +49,7 @@ const Actions: React.FC<any> = () => {
         <a onClick={(e) => e.preventDefault()}>
           {isLogin ? (
             <Space>
-              <Avatar src='https://joeschmoe.io/api/v1/random' />
+              {/* <Avatar src='https://joeschmoe.io/api/v1/random' /> */}
               {info.name}
             </Space>
           ) : (

@@ -31,16 +31,19 @@ export enum ColumnEnum {
 
 interface IColumnProps {
   handleBaseActions(R: ApplicationItem, code: ActionCodeEnum): void;
+  handleLink(R: ApplicationItem): void;
 }
 
-export const getColumns = ({ handleBaseActions }: IColumnProps) => {
+export const getColumns = ({ handleBaseActions, handleLink }: IColumnProps) => {
   return [
     {
       title: '应用名称',
       dataIndex: ColumnEnum.Name,
       key: ColumnEnum.Name,
       width: 160,
-      ellipsis: true,
+      render: (name: string, record: ApplicationItem) => {
+        return <div onClick={() => handleLink(record)}>{name}</div>;
+      },
     },
     {
       title: '应用编码',
