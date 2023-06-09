@@ -167,6 +167,8 @@ export enum IMenuTypeEnum {
 }
 
 export interface MenuItem {
+  id: number;
+
   name: string;
 
   code?: string;

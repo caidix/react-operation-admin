@@ -3,6 +3,8 @@ import {
   IGetAllRoleGroupsResp,
   IGetAllRolesReq,
   IGetAllRolesResp,
+  IGetAppUserMenuReq,
+  IGetAppUserMenuResp,
   IGetRoleListReq,
   IGetRoleListResp,
   IGetSystemRoleAuthReq,
@@ -65,4 +67,8 @@ export const updateSystemRoleAuth = (data: IUpdateSystemRoleAuthReq) => {
 
 export const updateMenuRoleAuth = (data: IUpdateMenuRoleAuthReq) => {
   return http.post('/role/update-auth-menus', data);
+};
+
+export const getAppUserMenu = (params: IGetAppUserMenuReq) => {
+  return http.get<IGetAppUserMenuResp>('/role/app-user-menu', params);
 };

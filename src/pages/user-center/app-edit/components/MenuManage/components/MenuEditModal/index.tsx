@@ -75,9 +75,15 @@ const EditApplicationModal: React.FC<IProps> = (props) => {
   };
 
   const menuTypeEnum = useMemo(() => {
-    if (!parent) return MenuTypeEnums;
+    console.log({ parent });
+    if (parent && parent.level === 2 && parent.menuType === MenuTypeEnum.Menu) {
+      return MenuTypeEnums.filter((i) => i.value === MenuTypeEnum.Page);
+    }
     const isAuth = parent && parent.menuType === MenuTypeEnum.Page;
-    return MenuTypeEnums.filter((i) => (isAuth ? i.value === MenuTypeEnum.Auth : i.value !== MenuTypeEnum.Auth));
+    if (!isAuth) {
+      return MenuTypeEnums.filter((i) => i.value !== MenuTypeEnum.Auth);
+    }
+    return MenuTypeEnums.filter((i) => i.value === MenuTypeEnum.Auth);
   }, [parent]);
 
   return (

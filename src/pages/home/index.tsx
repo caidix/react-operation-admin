@@ -1,3 +1,4 @@
+import React from 'react';
 import type { ActionType } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
 import { getOrganizationList } from '@src/api/user-center/user-group-management';
@@ -8,7 +9,6 @@ import { Button, message } from 'antd';
 import { useRef } from 'react';
 import { getColumns } from './config';
 import styles from './index.module.less';
-
 const UserGroupManagement = () => {
   const request = async (params: IOrganizationListReq) => {
     const [err, res] = await requestExecute(getOrganizationList, {

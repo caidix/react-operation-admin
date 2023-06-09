@@ -120,9 +120,9 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
   };
 
   const getLevelActions = (record: Required<DataType>) => {
-    // 数组长度 - 最高层级3级不可再加
+    // 数组长度 - 菜单最高层级3级不可再加 - 子页面可以增加权限
     let temp = levelActions;
-    if (record.level >= MAX_LEVEL) {
+    if (record.level >= MAX_LEVEL && record.menuType === MenuTypeEnum.Menu) {
       temp = temp.filter((action) => action.code !== ActionCodeEnum.CreateSubMenu);
     }
     // 上下移动按钮显示
@@ -182,7 +182,7 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
           [MenuFieldEnum.SystemCode]: record[MenuFieldEnum.SystemCode],
         });
         if (!err) {
-          submit();
+          await submit();
           return message.success('删除菜单成功');
         }
       },
@@ -241,7 +241,15 @@ const AppMenuManage: React.FC<IProps> = ({ code }) => {
           </>
         }
       />
-      <CustomTable bordered size='middle' columns={columns} scroll={{ x: 1500 }} {...tableExpandProps} {...tableProps} pagination={false} />
+      <CustomTable
+        bordered
+        size='middle'
+        columns={columns}
+        scroll={{ x: 1500 }}
+        {...tableExpandProps}
+        {...tableProps}
+        pagination={false}
+      />
       <MenuEditModal {...editModalInfo} code={code} onConfirm={reload} onClose={closeEditModal} />
     </div>
   );

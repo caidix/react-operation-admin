@@ -94,10 +94,17 @@ export const userSlice = createSlice({
         menuList: payload.menuList,
       };
     },
+    setAuthList(state, action) {
+      const payload = action.payload;
+      state = {
+        ...state,
+        authList: payload.authList,
+      };
+    },
   },
 });
 // 导出加减的方法
-export const { setLogin, setLogout } = userSlice.actions;
+export const { setLogin, setLogout, setCurrentApp, setAuthList } = userSlice.actions;
 
 // 默认导出
 export default userSlice.reducer;

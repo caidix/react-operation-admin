@@ -85,3 +85,11 @@ export interface IPostMenuAuthListResp {
   list: MenuItem[];
   auths: number[];
 }
+
+export interface IGetAppUserMenuReq {
+  systemCode: string;
+}
+
+export interface IGetAppUserMenuResp {
+  list: MenuItem[];
+}

@@ -20,3 +20,8 @@ export function getMicroActivePath(appCode: string, slash = false): string {
   }
   return `${PlatformConsts.MICRO_APP_ACTIVE_RULE_PREFIX}/${appCode}`;
 }
+
+
+export function formatMenus(list) {
+  
+}
